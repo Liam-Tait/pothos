@@ -95,15 +95,15 @@ type Post {
   author: User!
   commentAuthorIds: [ID!]!
   comments: [Comment!]!
-  commentsConnection(after: ID, before: ID, first: Int, last: Int): CommentConnection!
+  commentsConnection(after: String, before: String, first: Int, last: Int): CommentConnection!
   content: String
   createdAt: String!
   id: ID!
-  manualMediaConnection(after: ID, before: ID, first: Int, inverted: Boolean, last: Int): PostManualMediaConnection!
+  manualMediaConnection(after: String, before: String, first: Int, inverted: Boolean, last: Int): PostManualMediaConnection!
   media: [Media!]!
-  mediaConnection(after: ID, before: ID, first: Int, last: Int): MediaConnection!
+  mediaConnection(after: String, before: String, first: Int, last: Int): MediaConnection!
   ownComments: [Comment!]!
-  ownCommentsConnection(after: ID, before: ID, first: Int, last: Int): PostOwnCommentsConnection!
+  ownCommentsConnection(after: String, before: String, first: Int, last: Int): PostOwnCommentsConnection!
   post: User!
 
   \\"\\"\\"Title for the post\\"\\"\\"
@@ -150,28 +150,28 @@ type Query {
   blog: Blog!
   findUniqueRelations: FindUniqueRelations!
   findUniqueRelationsSelect: FindUniqueRelations!
-  manualConnection(after: ID, before: ID, first: Int, last: Int): QueryManualConnection!
+  manualConnection(after: String, before: String, first: Int, last: Int): QueryManualConnection!
   me: User
   named: [Named]
-  namedConnection(after: ID, before: ID, first: Int, last: Int): QueryNamedConnection!
+  namedConnection(after: String, before: String, first: Int, last: Int): QueryNamedConnection!
   node(id: ID!): Node
   nodes(ids: [ID!]!): [Node]!
   post(id: ID!): Post
   posts: [Post!]!
-  postsBigIntCursor(after: ID, before: ID, first: Int, last: Int): QueryPostsBigIntCursorConnection!
+  postsBigIntCursor(after: String, before: String, first: Int, last: Int): QueryPostsBigIntCursorConnection!
   selectMe: SelectUser
   selectPost(id: ID!): SelectPost!
   selectPosts: [SelectPost!]!
-  unrelatedConnection(after: ID, before: ID, first: Int, last: Int): QueryUnrelatedConnection!
-  userConnection(after: ID, before: ID, first: Int, last: Int, test: Boolean): QueryUserConnection!
-  userConnectionWithErrors(after: ID, before: ID, first: Int, last: Int): QueryUserConnectionWithErrorsResult!
+  unrelatedConnection(after: String, before: String, first: Int, last: Int): QueryUnrelatedConnection!
+  userConnection(after: String, before: String, first: Int, last: Int, test: Boolean): QueryUserConnection!
+  userConnectionWithErrors(after: String, before: String, first: Int, last: Int): QueryUserConnectionWithErrorsResult!
   userOrProfile: [UserOrProfile]
   users: [User!]!
   usersWithError: QueryUsersWithErrorResult!
   viewer: Viewer!
   viewerNode: ViewerNode!
-  withCompositeConnection(after: ID, before: ID, first: Int, last: Int): QueryWithCompositeConnection!
-  withIDSelectConnection(after: ID, before: ID, first: Int, last: Int): QueryWithIDSelectConnection!
+  withCompositeConnection(after: String, before: String, first: Int, last: Int): QueryWithCompositeConnection!
+  withIDSelectConnection(after: String, before: String, first: Int, last: Int): QueryWithIDSelectConnection!
 }
 
 type QueryManualConnection {
@@ -269,7 +269,7 @@ type QueryWithIDSelectConnectionEdge {
 
 \\"\\"\\"Model for Posts!\\"\\"\\"
 type SelectPost implements Node {
-  comments(after: ID, before: ID, first: Int, last: Int): CommentConnection!
+  comments(after: String, before: String, first: Int, last: Int): CommentConnection!
   content: String
   createdAt: String!
   id: ID!
@@ -280,12 +280,12 @@ type SelectPost implements Node {
 
 type SelectUser implements Node {
   email: String!
-  following(after: ID, before: ID, first: Int, last: Int): SelectUserFollowingConnection!
+  following(after: String, before: String, first: Int, last: Int): SelectUserFollowingConnection!
   id: ID!
   name: String
   postCount: Int!
   posts: [SelectPost!]!
-  postsConnection(after: ID, before: ID, first: Int, last: Int, oldestFirst: Boolean): SelectUserPostsConnection!
+  postsConnection(after: String, before: String, first: Int, last: Int, oldestFirst: Boolean): SelectUserPostsConnection!
   profile: Profile
 }
 
@@ -317,18 +317,18 @@ type Unrelated {
 
 type User implements Named & Node {
   commentedPosts: [Post!]!
-  commentedPostsConnection(after: ID, before: ID, first: Int, last: Int): UserCommentedPostsConnection!
-  commentsConnection(after: ID, before: ID, first: Int, last: Int): UserCommentsConnection!
+  commentedPostsConnection(after: String, before: String, first: Int, last: Int): UserCommentedPostsConnection!
+  commentsConnection(after: String, before: String, first: Int, last: Int): UserCommentsConnection!
   directProfileWithErrors: UserDirectProfileWithErrorsResult
   email: String!
-  following(after: ID, before: ID, first: Int, last: Int): UserFollowingConnection!
+  following(after: String, before: String, first: Int, last: Int): UserFollowingConnection!
   id: ID!
   name: String
   postCount: Int!
   posts(limit: Int, oldestFirst: Boolean): [Post!]!
-  postsConnection(after: ID, before: ID, first: Int, last: Int, oldestFirst: Boolean, published: Boolean): UserPostsConnection!
-  postsConnectionWithErrors(after: ID, before: ID, first: Int, last: Int): UserPostsConnectionWithErrorsResult!
-  postsSkipConnection(after: ID, before: ID, first: Int, last: Int, skip: Int, take: Int): UserPostsSkipConnection!
+  postsConnection(after: String, before: String, first: Int, last: Int, oldestFirst: Boolean, published: Boolean): UserPostsConnection!
+  postsConnectionWithErrors(after: String, before: String, first: Int, last: Int): UserPostsConnectionWithErrorsResult!
+  postsSkipConnection(after: String, before: String, first: Int, last: Int, skip: Int, take: Int): UserPostsSkipConnection!
   prismaFieldComments: [Comment!]!
   profile: Profile
   profileThroughManualLookup: Profile
@@ -422,7 +422,7 @@ type UserProfileWithErrorsSuccess {
 
 type Viewer {
   bio: String
-  comments(after: ID, before: ID, first: Int, last: Int): ViewerCommentsConnection!
+  comments(after: String, before: String, first: Int, last: Int): ViewerCommentsConnection!
   id: ID!
   postCount: Int!
   postPreviews: [PostPreview!]!

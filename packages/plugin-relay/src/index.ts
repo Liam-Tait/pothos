@@ -87,6 +87,14 @@ export class PothosRelayPlugin<Types extends SchemaTypes> extends BasePlugin<Typ
 SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin, {
   v3: (options) => ({
     relayOptions: undefined,
-    relay: options.relayOptions as {},
+    relay: {
+      ...(options.relayOptions as {}),
+      clientMutationId: options.relayOptions?.clientMutationId ?? 'required',
+      cursorType: options.relayOptions?.cursorType ?? 'ID',
+      edgeCursorType:
+        options.relayOptions?.edgeCursorType ?? options.relayOptions?.cursorType ?? 'String',
+      pageInfoCursorType:
+        options.relayOptions?.pageInfoCursorType ?? options.relayOptions?.cursorType ?? 'String',
+    },
   }),
 });

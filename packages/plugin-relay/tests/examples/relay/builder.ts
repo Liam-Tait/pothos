@@ -10,6 +10,11 @@ export default new SchemaBuilder<{
     Answer: { id: number; value: string; count: number };
   };
   Context: ContextType;
+  Defaults: 'v3';
 }>({
+  defaults: 'v3',
   plugins: [RelayPlugin, ComplexityPlugin],
+  relayOptions: {
+    // clientMutationId: 'required',
+  },
 });

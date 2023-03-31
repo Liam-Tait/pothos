@@ -53,7 +53,7 @@ schemaBuilderProto.pageInfoRef = function pageInfoRef() {
   pageInfoRefMap.set(this, ref);
 
   const {
-    cursorType = 'String',
+    pageInfoCursorType = this.options.relay?.cursorType ?? 'String',
     hasNextPageFieldOptions = {} as never,
     hasPreviousPageFieldOptions = {} as never,
     startCursorFieldOptions = {} as never,
@@ -74,12 +74,12 @@ schemaBuilderProto.pageInfoRef = function pageInfoRef() {
       startCursor: t.expose('startCursor', {
         nullable: true,
         ...(startCursorFieldOptions as {}),
-        type: cursorType,
+        type: pageInfoCursorType,
       }) as never,
       endCursor: t.expose('endCursor', {
         nullable: true,
         ...(endCursorFieldOptions as {}),
-        type: cursorType,
+        type: pageInfoCursorType,
       }) as never,
     }),
   });
@@ -374,7 +374,8 @@ schemaBuilderProto.relayMutationField = function relayMutationField(
     } = {},
   } = this.options;
 
-  const includeClientMutationId = this.options.relay?.clientMutationId !== 'omit';
+  const includeClientMutationId =
+    this.options.relay?.clientMutationId && this.options.relay?.clientMutationId !== 'omit';
 
   let inputRef: InputObjectRef<unknown>;
   let argName = 'input';
@@ -562,7 +563,7 @@ schemaBuilderProto.edgeObject = function edgeObject({
   verifyRef(type);
 
   const {
-    cursorType = 'String',
+    edgeCursorType = this.options.relay?.cursorType ?? 'String',
     cursorFieldOptions = {} as never,
     nodeFieldOptions: { nullable: nodeNullable = false, ...nodeFieldOptions } = {} as never,
   } = this.options.relay ?? {};
@@ -595,7 +596,7 @@ schemaBuilderProto.edgeObject = function edgeObject({
       }),
       cursor: t.expose('cursor', {
         nullable: false,
-        type: cursorType,
+        type: edgeCursorType,
         ...cursorFieldOptions,
       }) as never,
       ...edgeFields?.(t),

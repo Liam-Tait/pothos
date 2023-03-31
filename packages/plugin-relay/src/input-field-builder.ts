@@ -69,8 +69,7 @@ inputFieldBuilder.globalID = function globalID<Req extends boolean>(
 
 inputFieldBuilder.connectionArgs = function connectionArgs() {
   const {
-    // TODO(breaking) make this default match other cursor fields
-    cursorType = 'ID',
+    cursorType = 'String',
     beforeArgOptions = {} as never,
     afterArgOptions = {} as never,
     firstArgOptions = {} as never,

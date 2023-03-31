@@ -39,6 +39,7 @@ export const globalConnectionFieldsMap = new WeakMap<
   ((ref: ObjectRef<ConnectionShape<SchemaTypes, unknown, boolean>>) => void)[]
 >();
 schemaBuilderProto.pageInfoRef = function pageInfoRef() {
+<<<<<<< HEAD
   if (pageInfoRefMap.has(this)) {
     return pageInfoRefMap.get(this)!;
   }
@@ -75,6 +76,38 @@ schemaBuilderProto.pageInfoRef = function pageInfoRef() {
     }),
   });
   return ref;
+=======
+    if (pageInfoRefMap.has(this)) {
+        return pageInfoRefMap.get(this)!;
+    }
+    const ref = this.objectRef<PageInfoShape>("PageInfo");
+    pageInfoRefMap.set(this, ref);
+    const { pageInfoCursorType = this.options.relay?.cursorType ?? "String", hasNextPageFieldOptions = {} as never, hasPreviousPageFieldOptions = {} as never, startCursorFieldOptions = {} as never, endCursorFieldOptions = {} as never, } = this.options.relay ?? {};
+    ref.implement({
+        ...this.options.relay?.pageInfoTypeOptions,
+        fields: (t) => ({
+            hasNextPage: t.exposeBoolean("hasNextPage", {
+                nullable: false,
+                ...hasNextPageFieldOptions,
+            }),
+            hasPreviousPage: t.exposeBoolean("hasPreviousPage", {
+                nullable: false,
+                ...hasPreviousPageFieldOptions,
+            }),
+            startCursor: t.expose("startCursor", {
+                nullable: true,
+                ...(startCursorFieldOptions as {}),
+                type: pageInfoCursorType,
+            }) as never,
+            endCursor: t.expose("endCursor", {
+                nullable: true,
+                ...(endCursorFieldOptions as {}),
+                type: pageInfoCursorType,
+            }) as never,
+        }),
+    });
+    return ref;
+>>>>>>> 9838cc71 (Update relay plugin default options)
 };
 schemaBuilderProto.nodeInterfaceRef = function nodeInterfaceRef() {
   if (nodeInterfaceRefMap.has(this)) {
@@ -341,6 +374,7 @@ schemaBuilderProto.globalConnectionFields = function globalConnectionFields(fiel
   globalConnectionFieldsMap.get(this)!.push(onRef);
 };
 const mutationIdCache = createContextCache(() => new Map<string, string>());
+<<<<<<< HEAD
 schemaBuilderProto.relayMutationField = function relayMutationField(
   fieldName,
   inputOptionsOrRef,
@@ -386,6 +420,51 @@ schemaBuilderProto.relayMutationField = function relayMutationField(
             }
           : {}),
       }),
+=======
+schemaBuilderProto.relayMutationField = function relayMutationField(fieldName, inputOptionsOrRef, { resolve, ...fieldOptions }, { name: payloadName = `${capitalize(fieldName)}Payload`, outputFields, interfaces, ...paylaodOptions }) {
+    const { relay: { clientMutationIdInputOptions = {} as never, clientMutationIdFieldOptions = {} as never, mutationInputArgOptions = {} as never, } = {}, } = this.options;
+    const includeClientMutationId = this.options.relay?.clientMutationId && this.options.relay?.clientMutationId !== "omit";
+    let inputRef: InputObjectRef<unknown>;
+    let argName = "input";
+    if (inputOptionsOrRef instanceof InputObjectRef) {
+        inputRef = inputOptionsOrRef;
+    }
+    else {
+        const { name: inputName = `${capitalize(fieldName)}Input`, argName: argNameFromOptions = "input", inputFields, ...inputOptions } = inputOptionsOrRef;
+        argName = argNameFromOptions;
+        inputRef = this.inputType(inputName, {
+            ...this.options.relay?.defaultMutationInputTypeOptions,
+            ...inputOptions,
+            fields: (t) => ({
+                ...inputFields(t),
+                ...(includeClientMutationId
+                    ? {
+                        clientMutationId: t.id({
+                            ...clientMutationIdInputOptions,
+                            required: this.options.relay?.clientMutationId !== "optional",
+                        }),
+                    }
+                    : {}),
+            }),
+        });
+    }
+    const payloadRef = this.objectRef<unknown>(payloadName).implement({
+        ...this.options.relay?.defaultPayloadTypeOptions,
+        ...paylaodOptions,
+        interfaces: interfaces as never,
+        fields: (t) => ({
+            ...(outputFields as ObjectFieldsShape<SchemaTypes, unknown>)(t),
+            ...(includeClientMutationId
+                ? {
+                    clientMutationId: t.id({
+                        nullable: this.options.relay?.clientMutationId === "optional",
+                        ...clientMutationIdFieldOptions,
+                        resolve: (parent, args, context, info) => mutationIdCache(context).get(String(info.path.prev!.key))!,
+                    }),
+                }
+                : {}),
+        }),
+>>>>>>> 9838cc71 (Update relay plugin default options)
     });
   }
   const payloadRef = this.objectRef<unknown>(payloadName).implement({
@@ -527,6 +606,7 @@ schemaBuilderProto.connectionObject = function connectionObject(
   globalConnectionFieldsMap.get(this)?.forEach((fieldFn) => void fieldFn(connectionRef));
   return connectionRef as never;
 };
+<<<<<<< HEAD
 schemaBuilderProto.edgeObject = function edgeObject({
   type,
   name: edgeName,
@@ -573,4 +653,37 @@ schemaBuilderProto.edgeObject = function edgeObject({
     }),
   });
   return edgeRef as never;
+=======
+schemaBuilderProto.edgeObject = function edgeObject({ type, name: edgeName, nodeNullable: nodeFieldNullable, nodeField, ...edgeOptions }) {
+    verifyRef(type);
+    const { edgeCursorType = this.options.relay?.cursorType ?? "String", cursorFieldOptions = {} as never, nodeFieldOptions: { nullable: nodeNullable = false, ...nodeFieldOptions } = {} as never, } = this.options.relay ?? {};
+    const edgeRef = this.objectRef<{
+        cursor: string;
+        node: unknown;
+    }>(edgeName);
+    const edgeFields = edgeOptions.fields as ObjectFieldsShape<SchemaTypes, {
+        cursor: string;
+        node: unknown;
+    }> | undefined;
+    this.objectType(edgeRef, {
+        ...(this.options.relay?.defaultEdgeTypeOptions as {}),
+        ...edgeOptions,
+        fields: (t) => ({
+            node: t.field({
+                nullable: nodeFieldNullable ?? nodeNullable,
+                ...nodeFieldOptions,
+                ...nodeField,
+                type,
+                resolve: (parent) => parent.node as never,
+            }),
+            cursor: t.expose("cursor", {
+                nullable: false,
+                type: edgeCursorType,
+                ...cursorFieldOptions,
+            }) as never,
+            ...edgeFields?.(t),
+        }),
+    });
+    return edgeRef as never;
+>>>>>>> 9838cc71 (Update relay plugin default options)
 };
