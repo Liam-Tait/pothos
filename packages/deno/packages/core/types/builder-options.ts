@@ -7,6 +7,7 @@ import type ObjectRef from '../refs/object.ts';
 import type { SchemaTypes } from './schema-types.ts';
 import type { BaseEnum, EnumParam, FieldNullability, inputFieldShapeKey, InputRef, InterfaceParam, ObjectParam, ParentShape as GetParentShape, ShapeFromTypeParam, TypeParam, } from './type-params.ts';
 import type { MaybePromise, Merge, Normalize, NormalizeNullableFields, RemoveNeverKeys, } from './utils.ts';
+export type AddVersionedDefaultsToBuilderOptions<Types extends SchemaTypes, Version extends keyof PothosSchemaTypes.VersionedSchemaBuilderOptions<SchemaTypes>> = PothosSchemaTypes.SchemaBuilderOptions<Types> extends infer Options ? PothosSchemaTypes.VersionedSchemaBuilderOptions<Types>[Version] extends infer Defaults ? RemoveNeverKeys<Omit<Options, keyof Defaults> & Defaults> : never : never;
 export type NormalizeSchemeBuilderOptions<Types extends SchemaTypes> = RemoveNeverKeys<PothosSchemaTypes.SchemaBuilderOptions<Types>>;
 export type Resolver<Parent, Args, Context, Type, Return = unknown> = (parent: Parent, args: Args, context: Context, info: GraphQLResolveInfo) => [
     Type

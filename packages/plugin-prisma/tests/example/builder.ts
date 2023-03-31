@@ -45,7 +45,7 @@ const builder = new SchemaBuilder<{
   };
 }>({
   plugins: [ErrorsPlugin, PrismaPlugin, RelayPlugin, ComplexityPlugin, SimpleObjects],
-  relayOptions: {},
+  relay: {},
   prisma: {
     filterConnectionTotalCount: true,
     client: () => prisma,

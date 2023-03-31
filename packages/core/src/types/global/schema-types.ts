@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface */
 import type { GraphQLDirective } from 'graphql';
 import type { PluginConstructorMap } from '../plugins';
-import type { DefaultsByVersion, MergedScalars, SchemaTypes } from '../schema-types';
+import type { DefaultScalars, MergedScalars, SchemaTypes, V3DefaultScalars } from '../schema-types';
 import type { IsStrictMode } from '../utils';
 
 declare global {
@@ -18,6 +18,12 @@ declare global {
         ? never
         : 'Pothos may not work correctly when strict mode is not enabled in tsconfig.json';
       defaults: SchemaTypes['Defaults'] extends Types['Defaults'] ? never : Types['Defaults'];
+    }
+
+    export interface V3SchemaBuilderOptions<Types extends SchemaTypes> {}
+
+    export interface VersionedSchemaBuilderOptions<Types extends SchemaTypes> {
+      v3: V3SchemaBuilderOptions<Types>;
     }
 
     export interface BuildSchemaOptions<Types extends SchemaTypes> {
@@ -55,6 +61,15 @@ declare global {
       Context: object;
       DefaultFieldNullability: boolean;
       DefaultInputFieldRequiredness: boolean;
+    }
+
+    export interface DefaultsByVersion {
+      v3: {
+        Scalars: V3DefaultScalars;
+      };
+      v4: {
+        Scalars: DefaultScalars;
+      };
     }
 
     export interface ExtendDefaultTypes<PartialTypes extends Partial<UserSchemaTypes>>

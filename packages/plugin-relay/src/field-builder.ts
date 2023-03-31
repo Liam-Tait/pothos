@@ -188,7 +188,7 @@ fieldBuilderProto.connection = function connection(
         );
 
   const fieldRef = this.field({
-    ...this.builder.options.relayOptions?.defaultConnectionFieldOptions,
+    ...this.builder.options.relay?.defaultConnectionFieldOptions,
     ...fieldOptions,
     type: connectionRef,
     args: {

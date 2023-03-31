@@ -84,4 +84,9 @@ export class PothosRelayPlugin<Types extends SchemaTypes> extends BasePlugin<Typ
   }
 }
 
-SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin);
+SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin, {
+  v3: (options) => ({
+    relayOptions: undefined,
+    relay: options.relayOptions as {},
+  }),
+});

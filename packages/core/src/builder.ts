@@ -30,6 +30,7 @@ import ScalarRef from './refs/scalar';
 import UnionRef from './refs/union';
 import type {
   AbstractReturnShape,
+  AddVersionedDefaultsToBuilderOptions,
   BaseEnum,
   EnumParam,
   EnumTypeOptions,
@@ -76,19 +77,39 @@ import { normalizeEnumValues, valuesFromEnum, verifyInterfaces, verifyRef } from
 
 export default class SchemaBuilder<Types extends SchemaTypes> {
   static plugins: Partial<PluginConstructorMap<SchemaTypes>> = {};
+  static optionNormalizers: Map<
+    string,
+    {
+      v3?: (
+        options: NormalizeSchemeBuilderOptions<SchemaTypes & { Defaults: 'v3' }>,
+      ) => Partial<NormalizeSchemeBuilderOptions<SchemaTypes>>;
+      v4?: undefined;
+    }
+  > = new Map();
 
   static allowPluginReRegistration = false;
 
   configStore: ConfigStore<Types>;
 
-  options: NormalizeSchemeBuilderOptions<Types>;
+  options: PothosSchemaTypes.SchemaBuilderOptions<Types>;
 
   defaultFieldNullability: boolean;
 
   defaultInputFieldRequiredness: boolean;
 
-  constructor(options: NormalizeSchemeBuilderOptions<Types>) {
-    this.options = options;
+  constructor(options: PothosSchemaTypes.SchemaBuilderOptions<Types>) {
+    this.options = [...SchemaBuilder.optionNormalizers.values()].reduce((opts, normalize) => {
+      if (options.defaults && typeof normalize[options.defaults] === 'function') {
+        return {
+          ...opts,
+          ...normalize[options.defaults]!(
+            opts as NormalizeSchemeBuilderOptions<SchemaTypes & { Defaults: 'v3' }>,
+          ),
+        };
+      }
+
+      return opts;
+    }, options);
 
     this.configStore = new ConfigStore<Types>();
 
@@ -110,12 +131,21 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
   static registerPlugin<T extends keyof PluginConstructorMap<SchemaTypes>>(
     name: T,
     plugin: PluginConstructorMap<SchemaTypes>[T],
+    normalizeOptions?: {
+      v3?: (
+        options: AddVersionedDefaultsToBuilderOptions<SchemaTypes, 'v3'>,
+      ) => Partial<NormalizeSchemeBuilderOptions<SchemaTypes>>;
+    },
   ) {
     if (!this.allowPluginReRegistration && this.plugins[name]) {
       throw new PothosError(`Received multiple implementations for plugin ${name}`);
     }
 
     this.plugins[name] = plugin;
+
+    if (normalizeOptions) {
+      this.optionNormalizers.set(name, normalizeOptions);
+    }
   }
 
   objectType<Interfaces extends InterfaceParam<Types>[], Param extends ObjectParam<Types>>(

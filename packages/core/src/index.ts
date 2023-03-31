@@ -18,7 +18,13 @@ import InternalListRef from './refs/list';
 import InternalObjectRef from './refs/object';
 import InternalScalarRef from './refs/scalar';
 import InternalUnionRef from './refs/union';
-import type { FieldKind, NormalizeSchemeBuilderOptions, RootName, SchemaTypes } from './types';
+import type {
+  AddVersionedDefaultsToBuilderOptions,
+  FieldKind,
+  NormalizeSchemeBuilderOptions,
+  RootName,
+  SchemaTypes,
+} from './types';
 
 export * from './errors';
 export * from './plugins';
@@ -30,7 +36,9 @@ const SchemaBuilder = SchemaBuilderClass as unknown as {
   allowPluginReRegistration: boolean;
 
   new <Types extends Partial<PothosSchemaTypes.UserSchemaTypes> = {}>(
-    options: NormalizeSchemeBuilderOptions<PothosSchemaTypes.ExtendDefaultTypes<Types>>,
+    options: Types extends { Defaults: 'v3' }
+      ? AddVersionedDefaultsToBuilderOptions<PothosSchemaTypes.ExtendDefaultTypes<Types>, 'v3'>
+      : NormalizeSchemeBuilderOptions<PothosSchemaTypes.ExtendDefaultTypes<Types>>,
   ): PothosSchemaTypes.SchemaBuilder<PothosSchemaTypes.ExtendDefaultTypes<Types>>;
 };
 

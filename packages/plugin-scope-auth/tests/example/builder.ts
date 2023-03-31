@@ -30,7 +30,7 @@ const builder = new SchemaBuilder<{
   PrismaTypes: PrismaTypes;
 }>({
   plugins: [ScopeAuthPlugin, PrismaPlugin, RelayPlugin],
-  relayOptions: {
+  relay: {
     clientMutationId: 'omit',
     cursorType: 'String',
   },

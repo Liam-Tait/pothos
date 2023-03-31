@@ -54,6 +54,11 @@ declare global {
     }
 
     export interface SchemaBuilderOptions<Types extends SchemaTypes> {
+      relay?: RelayPluginOptions<Types>;
+    }
+
+    export interface V3SchemaBuilderOptions<Types extends SchemaTypes> {
+      relay: never;
       relayOptions: RelayPluginOptions<Types>;
     }
 

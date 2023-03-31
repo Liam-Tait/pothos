@@ -16,17 +16,33 @@ import InterfaceRef, { ImplementableInterfaceRef } from './refs/interface.ts';
 import ObjectRef, { ImplementableObjectRef } from './refs/object.ts';
 import ScalarRef from './refs/scalar.ts';
 import UnionRef from './refs/union.ts';
-import type { AbstractReturnShape, BaseEnum, EnumParam, EnumTypeOptions, EnumValues, InputFieldMap, InputFieldsFromShape, InputShape, InputShapeFromFields, InterfaceFieldsShape, InterfaceFieldThunk, InterfaceParam, InterfaceTypeOptions, MutationFieldsShape, MutationFieldThunk, NormalizeArgs, NormalizeSchemeBuilderOptions, ObjectFieldsShape, ObjectFieldThunk, ObjectParam, ObjectTypeOptions, OutputShape, OutputType, ParentShape, PluginConstructorMap, PothosEnumTypeConfig, PothosInputObjectTypeConfig, PothosInterfaceTypeConfig, PothosMutationTypeConfig, PothosObjectTypeConfig, PothosQueryTypeConfig, PothosScalarTypeConfig, PothosSubscriptionTypeConfig, PothosUnionTypeConfig, QueryFieldsShape, QueryFieldThunk, ScalarName, SchemaTypes, ShapeFromEnumValues, SubscriptionFieldsShape, SubscriptionFieldThunk, ValuesFromEnum, } from './types/index.ts';
+import type { AbstractReturnShape, AddVersionedDefaultsToBuilderOptions, BaseEnum, EnumParam, EnumTypeOptions, EnumValues, InputFieldMap, InputFieldsFromShape, InputShape, InputShapeFromFields, InterfaceFieldsShape, InterfaceFieldThunk, InterfaceParam, InterfaceTypeOptions, MutationFieldsShape, MutationFieldThunk, NormalizeArgs, NormalizeSchemeBuilderOptions, ObjectFieldsShape, ObjectFieldThunk, ObjectParam, ObjectTypeOptions, OutputShape, OutputType, ParentShape, PluginConstructorMap, PothosEnumTypeConfig, PothosInputObjectTypeConfig, PothosInterfaceTypeConfig, PothosMutationTypeConfig, PothosObjectTypeConfig, PothosQueryTypeConfig, PothosScalarTypeConfig, PothosSubscriptionTypeConfig, PothosUnionTypeConfig, QueryFieldsShape, QueryFieldThunk, ScalarName, SchemaTypes, ShapeFromEnumValues, SubscriptionFieldsShape, SubscriptionFieldThunk, ValuesFromEnum, } from './types/index.ts';
 import { normalizeEnumValues, valuesFromEnum, verifyInterfaces, verifyRef } from './utils/index.ts';
 export default class SchemaBuilder<Types extends SchemaTypes> {
     static plugins: Partial<PluginConstructorMap<SchemaTypes>> = {};
+    static optionNormalizers: Map<string, {
+        v3?: (options: NormalizeSchemeBuilderOptions<SchemaTypes & {
+            Defaults: "v3";
+        }>) => Partial<NormalizeSchemeBuilderOptions<SchemaTypes>>;
+        v4?: undefined;
+    }> = new Map();
     static allowPluginReRegistration = false;
     configStore: ConfigStore<Types>;
-    options: NormalizeSchemeBuilderOptions<Types>;
+    options: PothosSchemaTypes.SchemaBuilderOptions<Types>;
     defaultFieldNullability: boolean;
     defaultInputFieldRequiredness: boolean;
-    constructor(options: NormalizeSchemeBuilderOptions<Types>) {
-        this.options = options;
+    constructor(options: PothosSchemaTypes.SchemaBuilderOptions<Types>) {
+        this.options = [...SchemaBuilder.optionNormalizers.values()].reduce((opts, normalize) => {
+            if (options.defaults && typeof normalize[options.defaults] === "function") {
+                return {
+                    ...opts,
+                    ...normalize[options.defaults]!(opts as NormalizeSchemeBuilderOptions<SchemaTypes & {
+                        Defaults: "v3";
+                    }>),
+                };
+            }
+            return opts;
+        }, options);
         this.configStore = new ConfigStore<Types>();
         this.defaultFieldNullability =
             (options as {
@@ -37,11 +53,16 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
                 defaultInputFieldRequiredness?: boolean;
             }).defaultInputFieldRequiredness ?? false;
     }
-    static registerPlugin<T extends keyof PluginConstructorMap<SchemaTypes>>(name: T, plugin: PluginConstructorMap<SchemaTypes>[T]) {
+    static registerPlugin<T extends keyof PluginConstructorMap<SchemaTypes>>(name: T, plugin: PluginConstructorMap<SchemaTypes>[T], normalizeOptions?: {
+        v3?: (options: AddVersionedDefaultsToBuilderOptions<SchemaTypes, "v3">) => Partial<NormalizeSchemeBuilderOptions<SchemaTypes>>;
+    }) {
         if (!this.allowPluginReRegistration && this.plugins[name]) {
             throw new PothosError(`Received multiple implementations for plugin ${name}`);
         }
         this.plugins[name] = plugin;
+        if (normalizeOptions) {
+            this.optionNormalizers.set(name, normalizeOptions);
+        }
     }
     objectType<Interfaces extends InterfaceParam<Types>[], Param extends ObjectParam<Types>>(param: Param, options: ObjectTypeOptions<Types, Param, ParentShape<Types, Param>, Interfaces>, fields?: ObjectFieldsShape<Types, ParentShape<Types, Param>>) {
         verifyRef(param);

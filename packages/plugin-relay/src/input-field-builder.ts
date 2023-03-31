@@ -75,7 +75,7 @@ inputFieldBuilder.connectionArgs = function connectionArgs() {
     afterArgOptions = {} as never,
     firstArgOptions = {} as never,
     lastArgOptions = {} as never,
-  } = this.builder.options.relayOptions;
+  } = this.builder.options.relay ?? {};
 
   return {
     before: this.field({ ...beforeArgOptions, type: cursorType, required: false }) as InputFieldRef<

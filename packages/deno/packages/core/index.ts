@@ -19,7 +19,7 @@ import InternalListRef from './refs/list.ts';
 import InternalObjectRef from './refs/object.ts';
 import InternalScalarRef from './refs/scalar.ts';
 import InternalUnionRef from './refs/union.ts';
-import type { FieldKind, NormalizeSchemeBuilderOptions, RootName, SchemaTypes } from './types/index.ts';
+import type { AddVersionedDefaultsToBuilderOptions, FieldKind, NormalizeSchemeBuilderOptions, RootName, SchemaTypes, } from './types/index.ts';
 export * from './errors.ts';
 export * from './plugins/index.ts';
 export * from './types/index.ts';
@@ -27,7 +27,9 @@ export * from './utils/index.ts';
 const SchemaBuilder = SchemaBuilderClass as unknown as {
     registerPlugin: typeof SchemaBuilderClass.registerPlugin;
     allowPluginReRegistration: boolean;
-    new <Types extends Partial<PothosSchemaTypes.UserSchemaTypes> = {}>(options: NormalizeSchemeBuilderOptions<PothosSchemaTypes.ExtendDefaultTypes<Types>>): PothosSchemaTypes.SchemaBuilder<PothosSchemaTypes.ExtendDefaultTypes<Types>>;
+    new <Types extends Partial<PothosSchemaTypes.UserSchemaTypes> = {}>(options: Types extends {
+        Defaults: "v3";
+    } ? AddVersionedDefaultsToBuilderOptions<PothosSchemaTypes.ExtendDefaultTypes<Types>, "v3"> : NormalizeSchemeBuilderOptions<PothosSchemaTypes.ExtendDefaultTypes<Types>>): PothosSchemaTypes.SchemaBuilder<PothosSchemaTypes.ExtendDefaultTypes<Types>>;
 };
 export default SchemaBuilder;
 export const FieldBuilder = InternalFieldBuilder as new <Types extends SchemaTypes, ParentShape, Kind extends Exclude<FieldKind, RootName> = Exclude<FieldKind, RootName>>(name: string, builder: SchemaBuilderClass<Types>, kind: FieldKind, graphqlKind: PothosSchemaTypes.PothosKindToGraphQLType[FieldKind]) => PothosSchemaTypes.FieldBuilder<Types, ParentShape, Kind>;

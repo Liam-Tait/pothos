@@ -24,6 +24,15 @@ import type {
   RemoveNeverKeys,
 } from './utils';
 
+export type AddVersionedDefaultsToBuilderOptions<
+  Types extends SchemaTypes,
+  Version extends keyof PothosSchemaTypes.VersionedSchemaBuilderOptions<SchemaTypes>,
+> = PothosSchemaTypes.SchemaBuilderOptions<Types> extends infer Options
+  ? PothosSchemaTypes.VersionedSchemaBuilderOptions<Types>[Version] extends infer Defaults
+    ? RemoveNeverKeys<Omit<Options, keyof Defaults> & Defaults>
+    : never
+  : never;
+
 export type NormalizeSchemeBuilderOptions<Types extends SchemaTypes> = RemoveNeverKeys<
   PothosSchemaTypes.SchemaBuilderOptions<Types>
 >;

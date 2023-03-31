@@ -1,3 +1,4 @@
+/* eslint-disable logical-assignment-operators */
 import { GraphQLResolveInfo } from 'graphql';
 import {
   brandWithType,
@@ -46,7 +47,7 @@ export async function resolveNodes<Types extends SchemaTypes>(
       const config = builder.configStore.getTypeConfig(typename, 'Object');
       const options = config.pothosOptions as NodeObjectOptions<Types, ObjectParam<Types>, []>;
       const shouldBrandObjects =
-        options.brandLoadedObjects ?? builder.options.relayOptions.brandLoadedObjects ?? false;
+        options.brandLoadedObjects ?? builder.options.relay?.brandLoadedObjects ?? false;
 
       const resultsForType = await resolveUncachedNodesForType(
         builder,

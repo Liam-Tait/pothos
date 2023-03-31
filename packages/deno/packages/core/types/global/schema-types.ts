@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface */
 import type { GraphQLDirective } from 'https://cdn.skypack.dev/graphql?dts';
 import type { PluginConstructorMap } from '../plugins.ts';
-import type { MergedScalars, SchemaTypes } from '../schema-types.ts';
+import type { DefaultScalars, MergedScalars, SchemaTypes, V3DefaultScalars } from '../schema-types.ts';
 import type { IsStrictMode } from '../utils.ts';
 declare global {
     export namespace PothosSchemaTypes {
@@ -11,6 +11,12 @@ declare global {
             defaultFieldNullability: false extends Types["DefaultFieldNullability"] ? never : Types["DefaultFieldNullability"];
             defaultInputFieldRequiredness: false extends Types["DefaultInputFieldRequiredness"] ? never : Types["DefaultInputFieldRequiredness"];
             notStrict: IsStrictMode extends true ? never : "Pothos may not work correctly when strict mode is not enabled in tsconfig.json";
+            defaults: SchemaTypes["Defaults"] extends Types["Defaults"] ? never : Types["Defaults"];
+        }
+        export interface V3SchemaBuilderOptions<Types extends SchemaTypes> {
+        }
+        export interface VersionedSchemaBuilderOptions<Types extends SchemaTypes> {
+            v3: V3SchemaBuilderOptions<Types>;
         }
         export interface BuildSchemaOptions<Types extends SchemaTypes> {
             directives?: readonly GraphQLDirective[];
@@ -31,6 +37,7 @@ declare global {
             InputObject: "InputObject";
         }
         export interface UserSchemaTypes {
+            Defaults: keyof DefaultsByVersion;
             Scalars: Record<string, {
                 Input: unknown;
                 Output: unknown;
@@ -42,7 +49,16 @@ declare global {
             DefaultFieldNullability: boolean;
             DefaultInputFieldRequiredness: boolean;
         }
+        export interface DefaultsByVersion {
+            v3: {
+                Scalars: V3DefaultScalars;
+            };
+            v4: {
+                Scalars: DefaultScalars;
+            };
+        }
         export interface ExtendDefaultTypes<PartialTypes extends Partial<UserSchemaTypes>> extends SchemaTypes {
+            Defaults: PartialTypes["Defaults"] & SchemaTypes["Defaults"];
             Scalars: MergedScalars<PartialTypes>;
             Objects: PartialTypes["Objects"] & {};
             Interfaces: PartialTypes["Interfaces"] & {};

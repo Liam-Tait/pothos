@@ -12,5 +12,4 @@ export default new SchemaBuilder<{
   Context: ContextType;
 }>({
   plugins: [RelayPlugin, ComplexityPlugin],
-  relayOptions: {},
 });

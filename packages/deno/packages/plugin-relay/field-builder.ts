@@ -92,7 +92,7 @@ fieldBuilderProto.connection = function connection({ type, edgesNullable, nodeNu
         ? connectionOptionsOrRef
         : this.builder.objectRef<ConnectionShape<SchemaTypes, unknown, boolean>>("Unnamed connection");
     const fieldRef = this.field({
-        ...this.builder.options.relayOptions?.defaultConnectionFieldOptions,
+        ...this.builder.options.relay?.defaultConnectionFieldOptions,
         ...fieldOptions,
         type: connectionRef,
         args: {

@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable logical-assignment-operators */
 import { GraphQLResolveInfo } from 'https://cdn.skypack.dev/graphql?dts';
 import { brandWithType, createContextCache, MaybePromise, ObjectParam, OutputType, PothosValidationError, SchemaTypes, } from '../../core/index.ts';
 import { NodeObjectOptions } from '../types.ts';
@@ -28,7 +29,7 @@ export async function resolveNodes<Types extends SchemaTypes>(builder: PothosSch
         const config = builder.configStore.getTypeConfig(typename, "Object");
         const options = config.pothosOptions as NodeObjectOptions<Types, ObjectParam<Types>, [
         ]>;
-        const shouldBrandObjects = options.brandLoadedObjects ?? builder.options.relayOptions.brandLoadedObjects ?? false;
+        const shouldBrandObjects = options.brandLoadedObjects ?? builder.options.relay?.brandLoadedObjects ?? false;
         const resultsForType = await resolveUncachedNodesForType(builder, context, info, ids, typename);
         resultsForType.forEach((val, i) => {
             if (shouldBrandObjects) {

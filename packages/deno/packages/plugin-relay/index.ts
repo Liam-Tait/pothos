@@ -47,4 +47,9 @@ export class PothosRelayPlugin<Types extends SchemaTypes> extends BasePlugin<Typ
         return (parent, args, context, info) => subscribe(parent, argMapper(args, undefined, context, info), context, info);
     }
 }
-SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin);
+SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin, {
+    v3: (options) => ({
+        relayOptions: undefined,
+        relay: options.relayOptions as {},
+    }),
+});
