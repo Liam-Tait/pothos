@@ -104,7 +104,7 @@ export class PothosValidationPlugin<Types extends SchemaTypes> extends BasePlugi
       validator = refine(validator, fieldConfig.pothosOptions.validate as ValidationOptionUnion);
     }
 
-    const validationError = this.builder.options.validationOptions?.validationError;
+    const validationError = this.builder.options.validation?.validationError;
 
     const validatorWithErrorHandling =
       validationError &&
@@ -194,7 +194,14 @@ export class PothosValidationPlugin<Types extends SchemaTypes> extends BasePlugi
   }
 }
 
-SchemaBuilder.registerPlugin(pluginName, PothosValidationPlugin);
+SchemaBuilder.registerPlugin(pluginName, PothosValidationPlugin, {
+  v3(options) {
+    return {
+      validationOptions: undefined,
+      validation: options.validationOptions,
+    };
+  },
+});
 
 export default pluginName;
 

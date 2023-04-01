@@ -42,7 +42,7 @@ const builder = new SchemaBuilder<{
 }>({
   relay: {},
   defaultFieldNullability: true,
-  scopeAuthOptions: {
+  scopeAuth: {
     treatErrorsAsUnauthorized: true,
     unauthorizedError: (parent, context, info, result) => {
       if (context.throwFirst) {
@@ -51,35 +51,35 @@ const builder = new SchemaBuilder<{
 
       return result.message;
     },
+    authScopes: (context) => ({
+      loggedIn: !!context.user,
+      admin: !!context.user?.roles.includes('admin'),
+      syncPermission: (perm) => {
+        context.count?.('syncPermission');
+
+        if (context.throwInScope) {
+          throw new Error('syncPermission');
+        }
+
+        return !!context.user?.permissions.includes(perm);
+      },
+      asyncPermission: async (perm) => {
+        context.count?.('asyncPermission');
+
+        await Promise.resolve();
+
+        if (context.throwInScope) {
+          throw new Error('asyncPermission');
+        }
+
+        return !!context.user?.permissions.includes(perm);
+      },
+    }),
   },
   prisma: {
     client: db,
   },
   plugins: [ScopeAuthPlugin],
-  authScopes: (context) => ({
-    loggedIn: !!context.user,
-    admin: !!context.user?.roles.includes('admin'),
-    syncPermission: (perm) => {
-      context.count?.('syncPermission');
-
-      if (context.throwInScope) {
-        throw new Error('syncPermission');
-      }
-
-      return !!context.user?.permissions.includes(perm);
-    },
-    asyncPermission: async (perm) => {
-      context.count?.('asyncPermission');
-
-      await Promise.resolve();
-
-      if (context.throwInScope) {
-        throw new Error('asyncPermission');
-      }
-
-      return !!context.user?.permissions.includes(perm);
-    },
-  }),
 });
 
 builder.objectType(User, {

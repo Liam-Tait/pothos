@@ -20,7 +20,9 @@ const builder = new SchemaBuilder<{
   };
 }>({
   plugins: [DirectivesPlugin, FederationPlugin],
-  useGraphQLToolsUnorderedDirectives: true,
+  directives: {
+    useGraphQLToolsUnorderedDirectives: true,
+  },
   defaultFieldNullability: true,
 });
 

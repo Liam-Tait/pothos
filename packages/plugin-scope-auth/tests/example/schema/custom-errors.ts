@@ -10,6 +10,7 @@ interface Context {
 }
 
 const builder = new SchemaBuilder<{
+  Defaults: 'v3';
   Context: Context;
   AuthScopes: {
     loggedIn: boolean;
@@ -22,7 +23,8 @@ const builder = new SchemaBuilder<{
   };
   DefaultFieldNullability: true;
 }>({
-  relay: {},
+  defaults: 'v3',
+  relayOptions: {},
   defaultFieldNullability: true,
   scopeAuthOptions: {
     unauthorizedError: (parent, context, info, result) =>

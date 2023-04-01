@@ -52,7 +52,7 @@ const builder = new SchemaBuilder<{
     dmmf: Prisma.dmmf,
     exposeDescriptions: true,
   },
-  errorOptions: {
+  errors: {
     defaultTypes: [Error],
   },
 });

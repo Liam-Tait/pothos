@@ -6,7 +6,9 @@ const builder = new SchemaBuilder<{
   DefaultFieldNullability: true;
 }>({
   plugins: [DirectivesPlugin, FederationPlugin],
-  useGraphQLToolsUnorderedDirectives: true,
+  directives: {
+    useGraphQLToolsUnorderedDirectives: true,
+  },
   defaultFieldNullability: true,
 });
 

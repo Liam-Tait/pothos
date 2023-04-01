@@ -37,23 +37,23 @@ const builder = new SchemaBuilder<{
   prisma: {
     client: db,
   },
-  scopeAuthOptions: {
+  scopeAuth: {
     authorizeOnSubscribe: true,
+    authScopes: async (context) => ({
+      loggedIn: !!context.user,
+      admin: !!context.user?.roles.includes('admin'),
+      syncPermission: (perm) => {
+        context.count?.('syncPermission');
+
+        return !!context.user?.permissions.includes(perm);
+      },
+      asyncPermission: async (perm) => {
+        context.count?.('asyncPermission');
+
+        return !!context.user?.permissions.includes(perm);
+      },
+    }),
   },
-  authScopes: async (context) => ({
-    loggedIn: !!context.user,
-    admin: !!context.user?.roles.includes('admin'),
-    syncPermission: (perm) => {
-      context.count?.('syncPermission');
-
-      return !!context.user?.permissions.includes(perm);
-    },
-    asyncPermission: async (perm) => {
-      context.count?.('asyncPermission');
-
-      return !!context.user?.permissions.includes(perm);
-    },
-  }),
 });
 
 export default builder;

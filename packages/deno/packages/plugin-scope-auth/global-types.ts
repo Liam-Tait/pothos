@@ -9,7 +9,11 @@ declare global {
             scopeAuth: PothosScopeAuthPlugin<Types>;
         }
         export interface SchemaBuilderOptions<Types extends SchemaTypes> {
-            scopeAuthOptions?: ScopeAuthPluginOptions<Types>;
+            scopeAuth: ScopeAuthPluginOptions<Types>;
+        }
+        export interface V3SchemaBuilderOptions<Types extends SchemaTypes> {
+            scopeAuth: never;
+            scopeAuthOptions?: Omit<ScopeAuthPluginOptions<Types>, "authScopes">;
             authScopes: ScopeAuthInitializer<Types>;
         }
         export interface SchemaBuilder<Types extends SchemaTypes> {
