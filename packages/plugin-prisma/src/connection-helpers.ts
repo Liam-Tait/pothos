@@ -17,12 +17,12 @@ export const prismaModelKey = Symbol.for('Pothos.prismaModelKey');
 
 export function prismaConnectionHelpers<
   Types extends SchemaTypes,
-  RefOrType extends PrismaObjectRef<PrismaModelTypes> | keyof Types['PrismaTypes'],
+  RefOrType extends PrismaObjectRef<Types, PrismaModelTypes> | keyof Types['PrismaTypes'],
   Select extends Model['Select'] & {},
-  Model extends PrismaModelTypes = RefOrType extends PrismaObjectRef<infer T>
+  Model extends PrismaModelTypes = RefOrType extends PrismaObjectRef<Types, infer T>
     ? T & PrismaModelTypes
     : Types['PrismaTypes'][RefOrType & keyof Types['PrismaTypes']] & PrismaModelTypes,
-  Shape = RefOrType extends PrismaObjectRef<PrismaModelTypes, infer T> ? T : Model['Shape'],
+  Shape = RefOrType extends PrismaObjectRef<Types, PrismaModelTypes, infer T> ? T : Model['Shape'],
   EdgeShape = Model['Include'] extends Select
     ? Shape
     : ShapeFromSelection<Types, Model, { select: Select }>,
@@ -41,11 +41,13 @@ export function prismaConnectionHelpers<
   },
 ) {
   const modelName =
-    typeof refOrType === 'string' ? refOrType : (refOrType as PrismaObjectRef<Model>).modelName;
+    typeof refOrType === 'string'
+      ? refOrType
+      : (refOrType as PrismaObjectRef<Types, Model>).modelName;
   const ref =
     typeof refOrType === 'string'
       ? getRefFromModel(modelName, builder)
-      : (refOrType as ObjectRef<unknown>);
+      : (refOrType as ObjectRef<Types, unknown>);
   const formatCursor = getCursorFormatter(modelName, builder, options.cursor);
   const parseCursor = getCursorParser(modelName, builder, options.cursor);
   const cursorSelection = ModelLoader.getCursorSelection(ref, modelName, options.cursor, builder);
@@ -117,7 +119,7 @@ export function prismaConnectionHelpers<
   return {
     ref: (typeof refOrType === 'string'
       ? getRefFromModel(refOrType, builder)
-      : refOrType) as PrismaObjectRef<Model>,
+      : refOrType) as PrismaObjectRef<Types, Model>,
     resolve,
     select: options.select ?? {},
     getQuery,

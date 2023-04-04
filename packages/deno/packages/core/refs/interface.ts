@@ -2,7 +2,7 @@
 /* eslint-disable max-classes-per-file */
 import { InterfaceParam, InterfaceTypeOptions, OutputRef, outputShapeKey, parentShapeKey, SchemaTypes, } from '../types/index.ts';
 import BaseTypeRef from './base.ts';
-export default class InterfaceRef<T, P = T> extends BaseTypeRef implements OutputRef, PothosSchemaTypes.InterfaceRef<T, P> {
+export default class InterfaceRef<Types extends SchemaTypes, T, P = T> extends BaseTypeRef<Types> implements OutputRef, PothosSchemaTypes.InterfaceRef<Types, T, P> {
     override kind = "Interface" as const;
     [outputShapeKey]!: T;
     [parentShapeKey]!: P;
@@ -10,7 +10,7 @@ export default class InterfaceRef<T, P = T> extends BaseTypeRef implements Outpu
         super("Interface", name);
     }
 }
-export class ImplementableInterfaceRef<Types extends SchemaTypes, Shape, Parent = Shape> extends InterfaceRef<Shape, Parent> {
+export class ImplementableInterfaceRef<Types extends SchemaTypes, Shape, Parent = Shape> extends InterfaceRef<Types, Shape, Parent> {
     protected builder: PothosSchemaTypes.SchemaBuilder<Types>;
     constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string) {
         super(name);

@@ -37,27 +37,27 @@ declare global {
       addGraphQLObject: <Shape>(
         type: GraphQLObjectType<Shape>,
         options: AddGraphQLObjectTypeOptions<Types, Shape>,
-      ) => ObjectRef<Shape>;
+      ) => ObjectRef<Types, Shape>;
 
       addGraphQLInterface: <Shape>(
         type: GraphQLInterfaceType,
         options: AddGraphQLInterfaceTypeOptions<Types, Shape>,
-      ) => InterfaceRef<Shape>;
+      ) => InterfaceRef<Types, Shape>;
 
       addGraphQLUnion: <Shape>(
         type: GraphQLUnionType,
-        options: AddGraphQLUnionTypeOptions<Types, ObjectRef<Shape>>,
-      ) => UnionRef<Shape>;
+        options: AddGraphQLUnionTypeOptions<Types, ObjectRef<Types, Shape>>,
+      ) => UnionRef<Types, Shape>;
 
       addGraphQLEnum: <Shape extends string | number>(
         type: GraphQLEnumType,
         options: AddGraphQLEnumTypeOptions<Types, EnumValuesWithShape<Types, Shape>>,
-      ) => EnumRef<Shape>;
+      ) => EnumRef<Types, Shape>;
 
       addGraphQLInput: <Shape extends {}>(
         type: GraphQLInputObjectType,
         options: AddGraphQLInputTypeOptions<Types, Shape>,
-      ) => InputTypeRef<Shape>;
+      ) => InputTypeRef<Types, Shape>;
     }
   }
 }

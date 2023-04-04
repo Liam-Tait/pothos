@@ -1,4 +1,8 @@
-export default class BaseTypeRef implements PothosSchemaTypes.BaseTypeRef {
+import { SchemaTypes } from '../types';
+
+export default class BaseTypeRef<Types extends SchemaTypes>
+  implements PothosSchemaTypes.BaseTypeRef<Types>
+{
   kind;
 
   name;

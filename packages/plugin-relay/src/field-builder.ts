@@ -109,7 +109,7 @@ fieldBuilderProto.globalID = function globalID<
 };
 
 fieldBuilderProto.node = function node({ id, ...options }) {
-  return this.field<{}, InterfaceRef<unknown>, unknown, Promise<unknown>, true>({
+  return this.field<{}, InterfaceRef<SchemaTypes, unknown>, unknown, Promise<unknown>, true>({
     ...(options as {}),
     type: this.builder.nodeInterfaceRef(),
     nullable: true,
@@ -202,7 +202,7 @@ fieldBuilderProto.connection = function connection(
     this.builder.configStore.onFieldUse(fieldRef, (fieldConfig) => {
       const connectionName =
         connectionOptionsOrRef.name ??
-        `${this.typename}${capitalize(fieldConfig.name)}${
+        `${fieldConfig.parentType}${capitalize(fieldConfig.name)}${
           fieldConfig.name.toLowerCase().endsWith('connection') ? '' : 'Connection'
         }`;
 

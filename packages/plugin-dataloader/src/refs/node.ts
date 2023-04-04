@@ -35,7 +35,7 @@ export class ImplementableLoadableNodeRef<
     this.builder.configStore.onTypeConfig(this, (config) => {
       const nodeInterface = (
         this.builder as PothosSchemaTypes.SchemaBuilder<Types> & {
-          nodeInterfaceRef: () => InterfaceRef<unknown>;
+          nodeInterfaceRef: () => InterfaceRef<Types, unknown>;
         }
       ).nodeInterfaceRef();
 
@@ -58,7 +58,7 @@ export class ImplementableLoadableNodeRef<
         (t) =>
           (
             t as unknown as {
-              globalID: (options: Record<string, unknown>) => FieldRef<unknown>;
+              globalID: (options: Record<string, unknown>) => FieldRef<Types, unknown>;
             }
           ).globalID({
             ...(this.builder.options as { relayOptions?: { idFieldOptions?: {} } }).relayOptions

@@ -51,15 +51,21 @@ declare global {
       Kind extends 'Arg' | 'InputObject',
     > extends InternalInputFieldBuilder<Types, Kind> {}
 
-    export interface BaseTypeRef extends InternalBaseRef {}
-    export interface EnumRef<T, U = T> extends InternalEnumRef<T, U> {}
-    export interface InputObjectRef<T> extends InternalInputObjectRef<T> {}
+    export interface BaseTypeRef<Types extends SchemaTypes> extends InternalBaseRef<Types> {}
+    export interface EnumRef<Types extends SchemaTypes, T, U = T>
+      extends InternalEnumRef<Types, T, U> {}
+    export interface InputObjectRef<Types extends SchemaTypes, T>
+      extends InternalInputObjectRef<Types, T> {}
     export interface InputListRef<Types extends SchemaTypes, T>
       extends InternalInputListRef<Types, T> {}
-    export interface InterfaceRef<T, P = T> extends InternalInterfaceRef<T, P> {}
-    export interface ObjectRef<T, P = T> extends InternalObjectRef<T, P> {}
-    export interface ScalarRef<T, U, P = T> extends InternalScalarRef<T, U, P> {}
-    export interface UnionRef<T, P = T> extends InternalUnionRef<T, P> {}
+    export interface InterfaceRef<Types extends SchemaTypes, T, P = T>
+      extends InternalInterfaceRef<Types, T, P> {}
+    export interface ObjectRef<Types extends SchemaTypes, T, P = T>
+      extends InternalObjectRef<Types, T, P> {}
+    export interface ScalarRef<Types extends SchemaTypes, T, U, P = T>
+      extends InternalScalarRef<Types, T, U, P> {}
+    export interface UnionRef<Types extends SchemaTypes, T, P = T>
+      extends InternalUnionRef<Types, T, P> {}
     export interface ListRef<Types extends SchemaTypes, T, P = T>
       extends InternalListRef<Types, T, P> {}
   }

@@ -9,6 +9,7 @@ import {
   GraphQLString,
 } from 'graphql';
 import { PothosError, PothosSchemaError } from './errors';
+import ArgumentRef from './refs/arg';
 import BaseTypeRef from './refs/base';
 import BuiltinScalarRef from './refs/builtin-scalar';
 import FieldRef from './refs/field';
@@ -20,6 +21,8 @@ import OutputTypeRef from './refs/output';
 import type {
   ConfigurableRef,
   FieldMap,
+  GenericFieldRef,
+  GenericInputFieldRef,
   GraphQLFieldKind,
   InputFieldMap,
   InputRef,
@@ -40,14 +43,7 @@ import { unwrapListParam } from './utils';
 export default class ConfigStore<Types extends SchemaTypes> {
   typeConfigs = new Map<string, PothosTypeConfig>();
 
-  private fieldRefs = new WeakMap<
-    FieldRef | InputFieldRef,
-    (
-      name: string,
-      parentField: string | undefined,
-      typeConfig: PothosTypeConfig,
-    ) => PothosFieldConfig<Types>
-  >();
+  private fieldRefs = new WeakSet<GenericFieldRef | GenericInputFieldRef>();
 
   private fields = new Map<string, Map<string, PothosFieldConfig<Types>>>();
 
@@ -55,11 +51,17 @@ export default class ConfigStore<Types extends SchemaTypes> {
 
   private refsToName = new Map<ConfigurableRef<Types>, string>();
 
-  private scalarsToRefs = new Map<string, BuiltinScalarRef<unknown, unknown>>();
+  private scalarsToRefs = new Map<string, BuiltinScalarRef<Types, unknown, unknown>>();
 
-  private fieldRefsToConfigs = new Map<FieldRef | InputFieldRef, PothosFieldConfig<Types>[]>();
+  private fieldRefsToConfigs = new Map<
+    GenericFieldRef | GenericInputFieldRef,
+    PothosFieldConfig<Types>[]
+  >();
 
-  private pendingFields = new Map<FieldRef | InputFieldRef, InputType<Types> | OutputType<Types>>();
+  private pendingFields = new Map<
+    GenericFieldRef | GenericInputFieldRef,
+    InputType<Types> | OutputType<Types>
+  >();
 
   private pendingRefResolutions = new Map<
     ConfigurableRef<Types>,
@@ -67,7 +69,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
   >();
 
   private fieldRefCallbacks = new Map<
-    FieldRef | InputFieldRef,
+    GenericInputFieldRef | GenericFieldRef,
     ((config: PothosFieldConfig<Types>) => void)[]
   >();
 
@@ -144,15 +146,10 @@ export default class ConfigStore<Types extends SchemaTypes> {
   }
 
   addFieldRef(
-    ref: FieldRef | InputFieldRef,
+    ref: FieldRef<Types> | InputFieldRef<Types> | ArgumentRef<Types>,
     // We need to be able to resolve the types kind before configuring the field
     typeParam: InputTypeParam<Types> | TypeParam<Types>,
     args: InputFieldMap,
-    getConfig: (
-      name: string,
-      parentField: string | undefined,
-      typeConfig: PothosTypeConfig,
-    ) => PothosFieldConfig<Types>,
   ) {
     if (this.fieldRefs.has(ref)) {
       throw new PothosSchemaError(`FieldRef ${String(ref)} has already been added to config store`);
@@ -160,10 +157,9 @@ export default class ConfigStore<Types extends SchemaTypes> {
 
     const typeRefOrName = unwrapListParam(typeParam);
     const argRefs = Object.keys(args).map((argName) => {
-      const argRef = args[argName];
+      const argRef = args[argName] as ArgumentRef<Types>;
 
       argRef.fieldName = argName;
-      argRef.argFor = ref;
 
       return argRef;
     });
@@ -181,7 +177,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
       }
 
       this.pendingFields.delete(ref);
-      this.fieldRefs.set(ref, getConfig);
+      this.fieldRefs.add(ref);
     };
 
     if (
@@ -199,12 +195,16 @@ export default class ConfigStore<Types extends SchemaTypes> {
   }
 
   createFieldConfig<T extends GraphQLFieldKind>(
-    ref: FieldRef | InputFieldRef,
+    ref: GenericFieldRef | GenericInputFieldRef,
     name: string,
     typeConfig: PothosTypeConfig,
     parentField?: string,
     kind?: T,
   ): Extract<PothosFieldConfig<Types>, { graphqlKind: T }> {
+    if (!(ref instanceof FieldRef || ref instanceof ArgumentRef || ref instanceof InputFieldRef)) {
+      throw new PothosSchemaError(`Unknown ref type: ${String(ref)}`);
+    }
+
     if (!this.fieldRefs.has(ref)) {
       if (this.pendingFields.has(ref)) {
         throw new PothosSchemaError(
@@ -215,7 +215,19 @@ export default class ConfigStore<Types extends SchemaTypes> {
       throw new PothosSchemaError(`Missing definition for ${String(ref)}`);
     }
 
-    const config = this.fieldRefs.get(ref)!(name, parentField, typeConfig);
+    let config;
+
+    switch (ref.kind) {
+      case 'Arg':
+        config = (ref as ArgumentRef<Types>).getConfig(name, parentField!, typeConfig);
+        break;
+      case 'InputObject':
+        config = (ref as InputFieldRef<Types>).getConfig(name, typeConfig);
+        break;
+      default:
+        config = (ref as FieldRef<Types>).getConfig(name, typeConfig);
+        break;
+    }
 
     if (kind && config.graphqlKind !== kind) {
       throw new PothosError(
@@ -391,7 +403,10 @@ export default class ConfigStore<Types extends SchemaTypes> {
     }
   }
 
-  onFieldUse(ref: FieldRef | InputFieldRef, cb: (config: PothosFieldConfig<Types>) => void) {
+  onFieldUse(
+    ref: GenericFieldRef | GenericInputFieldRef,
+    cb: (config: PothosFieldConfig<Types>) => void,
+  ) {
     if (!this.fieldRefCallbacks.has(ref)) {
       this.fieldRefCallbacks.set(ref, []);
     }
@@ -487,7 +502,8 @@ export default class ConfigStore<Types extends SchemaTypes> {
     )?.[0];
 
     if (usedBy) {
-      return `<unnamed ref or enum: used by ${usedBy}>`;
+      // TODO: figure out what we can do about better error messages here
+      return `<unnamed ref or enum: used by ${String(usedBy)}>`;
     }
 
     return `<unnamed ref or enum>`;
@@ -495,7 +511,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
 
   private buildFields(typeRef: ConfigurableRef<Types>, fields: FieldMap | InputFieldMap) {
     Object.keys(fields).forEach((fieldName) => {
-      const fieldRef = fields[fieldName];
+      const fieldRef = fields[fieldName] as FieldRef<Types>;
 
       fieldRef.fieldName = fieldName;
 
@@ -511,7 +527,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
 
   private buildField(
     typeRef: ConfigurableRef<Types>,
-    field: FieldRef | InputFieldRef,
+    field: FieldRef<Types> | InputFieldRef<Types> | ArgumentRef<Types>,
     fieldName: string,
   ) {
     const typeConfig = this.getTypeConfig(typeRef);

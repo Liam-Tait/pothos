@@ -22,7 +22,7 @@ export class ExternalEntityRef<
   Types extends SchemaTypes,
   Shape extends object,
   Key extends Selection<object>,
-> extends OutputTypeRef<Shape> {
+> extends OutputTypeRef<Types, Shape> {
   override kind = 'Object' as const;
 
   private builder: PothosSchemaTypes.SchemaBuilder<Types>;
@@ -56,7 +56,7 @@ export class ExternalEntityRef<
     directives,
     ...options
   }: ExternalEntityOptions<Types, Shape, Interfaces>) {
-    this.builder.objectType(this as unknown as ObjectRef<unknown>, {
+    this.builder.objectType(this as unknown as ObjectRef<Types, unknown>, {
       ...(options as {} as PothosSchemaTypes.ObjectTypeOptions<Types, Shape>),
       name: this.name,
       directives: mergeDirectives(directives as [], [
@@ -65,9 +65,9 @@ export class ExternalEntityRef<
       ]) as [],
       fields: (t) => ({
         ...externalFields?.(
-          new RootFieldBuilder(this.name, this.builder, 'ExternalEntity', 'Object') as never,
+          new RootFieldBuilder(this.builder, 'ExternalEntity', 'Object') as never,
         ),
-        ...fields?.(new FieldBuilder(this.name, this.builder, 'ExtendedEntity', 'Object') as never),
+        ...fields?.(new FieldBuilder(this.builder, 'ExtendedEntity', 'Object') as never),
       }),
       extensions: {
         ...options.extensions,

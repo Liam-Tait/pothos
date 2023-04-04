@@ -9,9 +9,9 @@ import {
 } from '../types';
 import BaseTypeRef from './base';
 
-export default class ObjectRef<T, P = T>
-  extends BaseTypeRef
-  implements OutputRef, PothosSchemaTypes.ObjectRef<T, P>
+export default class ObjectRef<Types extends SchemaTypes, T, P = T>
+  extends BaseTypeRef<Types>
+  implements OutputRef, PothosSchemaTypes.ObjectRef<Types, T, P>
 {
   override kind = 'Object' as const;
 
@@ -27,7 +27,7 @@ export class ImplementableObjectRef<
   Types extends SchemaTypes,
   Shape,
   Parent = Shape,
-> extends ObjectRef<Shape, Parent> {
+> extends ObjectRef<Types, Shape, Parent> {
   protected builder: PothosSchemaTypes.SchemaBuilder<Types>;
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string) {
@@ -41,7 +41,7 @@ export class ImplementableObjectRef<
       ObjectTypeOptions<Types, ImplementableObjectRef<Types, Shape, Parent>, Parent, Interfaces>,
       'name'
     >,
-  ): PothosSchemaTypes.ObjectRef<Shape, Parent> {
+  ): PothosSchemaTypes.ObjectRef<Types, Shape, Parent> {
     return this.builder.objectType(
       this,
       options as ObjectTypeOptions<

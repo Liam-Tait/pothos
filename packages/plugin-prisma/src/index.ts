@@ -37,7 +37,7 @@ export const ObjectFieldBuilder = InternalPrismaObjectFieldBuilder as new <
   NeedsResolve extends boolean,
   Shape extends object = Model['Shape'],
 >(
-  name: string,
+  typename: string,
   builder: PothosSchemaTypes.SchemaBuilder<Types>,
 ) => PothosSchemaTypes.PrismaObjectFieldBuilder<Types, Model, NeedsResolve, Shape>;
 

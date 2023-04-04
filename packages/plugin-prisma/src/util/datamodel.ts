@@ -3,21 +3,24 @@ import { PrismaObjectRef } from '../object-ref';
 import { PrismaClient, PrismaDelegate, PrismaModelTypes } from '../types';
 import { getDMMF } from './get-client';
 
-export const refMap = new WeakMap<object, Map<string, PrismaObjectRef<PrismaModelTypes>>>();
+export const refMap = new WeakMap<
+  object,
+  Map<string, PrismaObjectRef<SchemaTypes, PrismaModelTypes>>
+>();
 export const findUniqueMap = new WeakMap<
   object,
-  Map<ObjectRef<unknown>, ((args: unknown, ctx: {}) => unknown) | null>
+  Map<ObjectRef<SchemaTypes, unknown>, ((args: unknown, ctx: {}) => unknown) | null>
 >();
 
 export const includeForRefMap = new WeakMap<
   object,
-  Map<ObjectRef<unknown>, Record<string, unknown> | null>
+  Map<ObjectRef<SchemaTypes, unknown>, Record<string, unknown> | null>
 >();
 
 export function getRefFromModel<Types extends SchemaTypes>(
   name: string,
   builder: PothosSchemaTypes.SchemaBuilder<Types>,
-): PrismaObjectRef<PrismaModelTypes> {
+): PrismaObjectRef<Types, PrismaModelTypes> {
   if (!refMap.has(builder)) {
     refMap.set(builder, new Map());
   }

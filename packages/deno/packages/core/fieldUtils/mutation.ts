@@ -3,6 +3,6 @@ import { SchemaTypes } from '../types/index.ts';
 import RootFieldBuilder from './root.ts';
 export default class MutationFieldBuilder<Types extends SchemaTypes, ParentShape> extends RootFieldBuilder<Types, ParentShape, "Mutation"> {
     constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
-        super("Mutation", builder, "Mutation", "Object");
+        super(builder, "Mutation", "Object");
     }
 }

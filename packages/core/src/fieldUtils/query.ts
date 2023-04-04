@@ -6,6 +6,6 @@ export default class QueryFieldBuilder<
   ParentShape,
 > extends RootFieldBuilder<Types, ParentShape, 'Query'> {
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
-    super('Query', builder, 'Query', 'Object');
+    super(builder, 'Query', 'Object');
   }
 }

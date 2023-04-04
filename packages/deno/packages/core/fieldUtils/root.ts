@@ -5,7 +5,7 @@ import { FieldKind, FieldNullability, FieldOptionsFromKind, SchemaTypes, TypePar
 import BaseFieldUtil from './base.ts';
 import InputFieldBuilder from './input.ts';
 export default class RootFieldBuilder<Types extends SchemaTypes, ParentShape, Kind extends FieldKind = FieldKind> extends BaseFieldUtil<Types, ParentShape, Kind> {
-    arg: ArgBuilder<Types> = new InputFieldBuilder<Types, "Arg">(this.builder, "Arg", this.typename).argBuilder();
+    arg: ArgBuilder<Types> = new InputFieldBuilder<Types, "Arg">(this.builder, "Arg").argBuilder();
     /**
      * Create a Boolean field
      * @param {PothosSchemaTypes.FieldOptions} options - Options for this field

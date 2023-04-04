@@ -8,9 +8,9 @@ import {
 } from '../types';
 import BaseTypeRef from './base';
 
-export default class InputObjectRef<T>
-  extends BaseTypeRef
-  implements InputRef<T>, PothosSchemaTypes.InputObjectRef<T>
+export default class InputObjectRef<Types extends SchemaTypes, T>
+  extends BaseTypeRef<Types>
+  implements InputRef<T>, PothosSchemaTypes.InputObjectRef<Types, T>
 {
   override kind = 'InputObject' as const;
 
@@ -24,7 +24,7 @@ export default class InputObjectRef<T>
 export class ImplementableInputObjectRef<
   Types extends SchemaTypes,
   T extends object,
-> extends InputObjectRef<RecursivelyNormalizeNullableFields<T>> {
+> extends InputObjectRef<Types, RecursivelyNormalizeNullableFields<T>> {
   protected builder: PothosSchemaTypes.SchemaBuilder<Types>;
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string) {
@@ -36,14 +36,14 @@ export class ImplementableInputObjectRef<
   implement(
     options: PothosSchemaTypes.InputObjectTypeOptions<
       Types,
-      InputFieldsFromShape<RecursivelyNormalizeNullableFields<T>>
+      InputFieldsFromShape<Types, RecursivelyNormalizeNullableFields<T>, 'InputObject'>
     >,
   ) {
     this.builder.inputType<
       ImplementableInputObjectRef<Types, T>,
-      InputFieldsFromShape<RecursivelyNormalizeNullableFields<T>>
+      InputFieldsFromShape<Types, RecursivelyNormalizeNullableFields<T>, 'InputObject'>
     >(this, options);
 
-    return this as InputObjectRef<T>;
+    return this as InputObjectRef<Types, T>;
   }
 }

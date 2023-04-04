@@ -154,7 +154,7 @@ declare global {
           CacheKey,
           Kind
         >,
-      ) => FieldRef<unknown>;
+      ) => FieldRef<Types, unknown>;
       loadableList: <
         Args extends InputFieldMap,
         Type extends OutputType<Types>,
@@ -174,7 +174,7 @@ declare global {
           CacheKey,
           Kind
         >,
-      ) => FieldRef<unknown>;
+      ) => FieldRef<Types, unknown>;
     }
   }
 }

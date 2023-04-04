@@ -25,22 +25,22 @@ const schemaBuilderProto = SchemaBuilder.prototype as PothosSchemaTypes.SchemaBu
 
 const pageInfoRefMap = new WeakMap<
   PothosSchemaTypes.SchemaBuilder<SchemaTypes>,
-  ObjectRef<PageInfoShape>
+  ObjectRef<SchemaTypes, PageInfoShape>
 >();
 
 const nodeInterfaceRefMap = new WeakMap<
   PothosSchemaTypes.SchemaBuilder<SchemaTypes>,
-  InterfaceRef<{}>
+  InterfaceRef<SchemaTypes, {}>
 >();
 
 export const connectionRefs = new WeakMap<
   PothosSchemaTypes.SchemaBuilder<SchemaTypes>,
-  ObjectRef<ConnectionShape<SchemaTypes, unknown, boolean>>[]
+  ObjectRef<SchemaTypes, ConnectionShape<SchemaTypes, unknown, boolean>>[]
 >();
 
 export const globalConnectionFieldsMap = new WeakMap<
   PothosSchemaTypes.SchemaBuilder<SchemaTypes>,
-  ((ref: ObjectRef<ConnectionShape<SchemaTypes, unknown, boolean>>) => void)[]
+  ((ref: ObjectRef<SchemaTypes, ConnectionShape<SchemaTypes, unknown, boolean>>) => void)[]
 >();
 
 schemaBuilderProto.pageInfoRef = function pageInfoRef() {
@@ -159,7 +159,7 @@ schemaBuilderProto.nodeInterfaceRef = function nodeInterfaceRef() {
         t.field({
           nullable: true,
           ...this.options.relay?.nodeQueryOptions,
-          type: ref as InterfaceRef<unknown>,
+          type: ref as InterfaceRef<SchemaTypes, unknown>,
           args: {
             id: t.arg.globalID({
               ...nodeQueryOptions?.args?.id,
@@ -190,7 +190,7 @@ schemaBuilderProto.nodeInterfaceRef = function nodeInterfaceRef() {
                   resolveNodes(this, context, info, [args.id as { id: string; typename: string }]),
                   (nodes) => nodes[0],
                 ),
-        }) as FieldRef<unknown>,
+        }) as FieldRef<SchemaTypes, unknown>,
     );
   }
 
@@ -319,7 +319,7 @@ schemaBuilderProto.node = function node(param, { interfaces, extensions, id, ...
 };
 
 schemaBuilderProto.globalConnectionField = function globalConnectionField(name, field) {
-  const onRef = (ref: ObjectRef<ConnectionShape<SchemaTypes, unknown, boolean>>) => {
+  const onRef = (ref: ObjectRef<SchemaTypes, ConnectionShape<SchemaTypes, unknown, boolean>>) => {
     this.objectField(
       ref,
       name,
@@ -337,7 +337,7 @@ schemaBuilderProto.globalConnectionField = function globalConnectionField(name, 
 };
 
 schemaBuilderProto.globalConnectionFields = function globalConnectionFields(fields) {
-  const onRef = (ref: ObjectRef<ConnectionShape<SchemaTypes, unknown, boolean>>) => {
+  const onRef = (ref: ObjectRef<SchemaTypes, ConnectionShape<SchemaTypes, unknown, boolean>>) => {
     this.objectFields(
       ref,
       fields as ObjectFieldsShape<SchemaTypes, ConnectionShape<SchemaTypes, unknown, boolean>>,
@@ -377,7 +377,7 @@ schemaBuilderProto.relayMutationField = function relayMutationField(
   const includeClientMutationId =
     this.options.relay?.clientMutationId && this.options.relay?.clientMutationId !== 'omit';
 
-  let inputRef: InputObjectRef<unknown>;
+  let inputRef: InputObjectRef<SchemaTypes, unknown>;
   let argName = 'input';
 
   if (inputOptionsOrRef instanceof InputObjectRef) {

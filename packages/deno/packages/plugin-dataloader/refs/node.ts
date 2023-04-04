@@ -12,7 +12,7 @@ export class ImplementableLoadableNodeRef<Types extends SchemaTypes, RefShape, S
         this.parseId = id.parse;
         this.builder.configStore.onTypeConfig(this, (config) => {
             const nodeInterface = (this.builder as PothosSchemaTypes.SchemaBuilder<Types> & {
-                nodeInterfaceRef: () => InterfaceRef<unknown>;
+                nodeInterfaceRef: () => InterfaceRef<Types, unknown>;
             }).nodeInterfaceRef();
             // eslint-disable-next-line no-param-reassign
             (config.pothosOptions as {
@@ -28,7 +28,7 @@ export class ImplementableLoadableNodeRef<Types extends SchemaTypes, RefShape, S
                 };
             }).relayOptions
                 ?.idFieldName ?? "id", (t) => (t as unknown as {
-                globalID: (options: Record<string, unknown>) => FieldRef<unknown>;
+                globalID: (options: Record<string, unknown>) => FieldRef<Types, unknown>;
             }).globalID({
                 ...(this.builder.options as {
                     relayOptions?: {

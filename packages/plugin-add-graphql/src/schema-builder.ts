@@ -22,6 +22,7 @@ import {
   isUnionType,
 } from 'graphql';
 import SchemaBuilder, {
+  ArgumentRef,
   createContextCache,
   EnumRef,
   EnumValueConfigMap,
@@ -176,7 +177,7 @@ proto.addGraphQLObject = function addGraphQLObject<Shape>(
           return;
         }
 
-        const args: Record<string, InputFieldRef> = {};
+        const args: Record<string, ArgumentRef<SchemaTypes>> = {};
 
         for (const { name, ...arg } of field.args) {
           const input = resolveInputType(this, arg.type);
@@ -246,7 +247,7 @@ proto.addGraphQLInterface = function addGraphQLInterface<Shape = unknown>(
           return;
         }
 
-        const args: Record<string, InputFieldRef> = {};
+        const args: Record<string, ArgumentRef<SchemaTypes>> = {};
 
         for (const { name, ...arg } of field.args) {
           args[name] = t.arg({
@@ -276,7 +277,11 @@ proto.addGraphQLInterface = function addGraphQLInterface<Shape = unknown>(
 
 proto.addGraphQLUnion = function addGraphQLUnion<Shape>(
   type: GraphQLUnionType,
-  { types, extensions, ...options }: AddGraphQLUnionTypeOptions<SchemaTypes, ObjectRef<Shape>>,
+  {
+    types,
+    extensions,
+    ...options
+  }: AddGraphQLUnionTypeOptions<SchemaTypes, ObjectRef<SchemaTypes, Shape>>,
 ) {
   return this.unionType<ObjectParam<SchemaTypes>, Shape>(options?.name ?? type.name, {
     ...options,
@@ -308,7 +313,10 @@ proto.addGraphQLEnum = function addGraphQLEnum<Shape extends string | number>(
       return acc;
     }, {});
 
-  const ref: EnumRef<Shape> = this.enumType<never, EnumValuesWithShape<SchemaTypes, Shape>>(
+  const ref: EnumRef<SchemaTypes, Shape> = this.enumType<
+    never,
+    EnumValuesWithShape<SchemaTypes, Shape>
+  >(
     (options?.name ?? type.name) as never,
     {
       ...options,
@@ -338,7 +346,7 @@ proto.addGraphQLInput = function addGraphQLInput<Shape extends {}>(
     extensions: { ...type.extensions, ...extensions },
     fields: (t) => {
       const existingFields = type.getFields();
-      const newFields: Record<string, InputFieldRef<unknown, 'InputObject'> | null> =
+      const newFields: Record<string, InputFieldRef<SchemaTypes, unknown> | null> =
         fields?.(t) ?? {};
       const combinedFields: typeof newFields = {
         ...newFields,

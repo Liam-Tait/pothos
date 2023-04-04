@@ -91,13 +91,13 @@ declare global {
       ) => GraphQLSchema;
 
       asEntity: <
-        Param extends ObjectRef<unknown> | InterfaceRef<unknown>,
+        Param extends ObjectRef<Types, unknown> | InterfaceRef<Types, unknown>,
         KeySelection extends Selection<object>,
       >(
         param: Param,
         options: {
           key: KeySelection | KeySelection[];
-          interfaceObject?: Param extends ObjectRef<unknown> ? boolean : never;
+          interfaceObject?: Param extends ObjectRef<Types, unknown> ? boolean : never;
           resolveReference: (
             parent: KeySelection[typeof selectionShapeKey],
             context: Types['Context'],

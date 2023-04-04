@@ -21,10 +21,10 @@ declare global {
             loadableNode: "relay" extends PluginName ? <Shape extends NameOrRef extends ObjectParam<Types> ? ShapeFromTypeParam<Types, NameOrRef, false> : object, Interfaces extends InterfaceParam<Types>[], NameOrRef extends ObjectParam<Types> | string, IDShape extends bigint | number | string = string, Key extends bigint | number | string = IDShape, CacheKey = Key>(nameOrRef: NameOrRef, options: LoadableNodeOptions<Types, Shape, Interfaces, NameOrRef, IDShape, Key, CacheKey>) => Omit<ImplementableLoadableNodeRef<Types, Key | Shape, Shape, IDShape, Key, CacheKey>, "implement"> : "@pothos/plugin-relay is required to use this method";
         }
         export interface RootFieldBuilder<Types extends SchemaTypes, ParentShape, Kind extends FieldKind = FieldKind> {
-            loadable: <Args extends InputFieldMap, Type extends TypeParam<Types>, Key, CacheKey, ResolveReturnShape, Nullable extends FieldNullability<Type> = Types["DefaultFieldNullability"]>(options: LoadableFieldOptions<Types, ParentShape, Type, Nullable, Args, ResolveReturnShape, Key, CacheKey, Kind>) => FieldRef<unknown>;
+            loadable: <Args extends InputFieldMap, Type extends TypeParam<Types>, Key, CacheKey, ResolveReturnShape, Nullable extends FieldNullability<Type> = Types["DefaultFieldNullability"]>(options: LoadableFieldOptions<Types, ParentShape, Type, Nullable, Args, ResolveReturnShape, Key, CacheKey, Kind>) => FieldRef<Types, unknown>;
             loadableList: <Args extends InputFieldMap, Type extends OutputType<Types>, Key, CacheKey, ResolveReturnShape, Nullable extends FieldNullability<[
                 Type
-            ]> = Types["DefaultFieldNullability"]>(options: LoadableListFieldOptions<Types, ParentShape, Type, Nullable, Args, ResolveReturnShape, Key, CacheKey, Kind>) => FieldRef<unknown>;
+            ]> = Types["DefaultFieldNullability"]>(options: LoadableListFieldOptions<Types, ParentShape, Type, Nullable, Args, ResolveReturnShape, Key, CacheKey, Kind>) => FieldRef<Types, unknown>;
         }
     }
 }

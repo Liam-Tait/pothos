@@ -1,3 +1,5 @@
+import type ArgumentRef from '../refs/arg';
+import type InputFieldRef from '../refs/input-field';
 import type InterfaceRef from '../refs/interface';
 import type ObjectRef from '../refs/object';
 import type { RootName, SchemaTypes } from './schema-types';
@@ -107,12 +109,12 @@ export type InputTypeParam<Types extends SchemaTypes> = InputType<Types> | [Inpu
 
 export type ObjectParam<Types extends SchemaTypes> =
   | Extract<OutputType<Types>, keyof Types['Objects']>
-  | ObjectRef<unknown> // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | ObjectRef<Types, unknown> // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | (new (...args: any[]) => any);
 
 export type InterfaceParam<Types extends SchemaTypes> =
   | Extract<OutputType<Types>, keyof Types['Interfaces']>
-  | InterfaceRef<unknown>
+  | InterfaceRef<Types, unknown>
   | (new (...args: any[]) => unknown);
 
 export interface BaseEnum {
@@ -233,3 +235,21 @@ export type FieldRequiredness<Param> =
               list: boolean;
             }
       : boolean);
+
+export type InputOrArgRef<
+  Types extends SchemaTypes,
+  T,
+  Kind extends 'Arg' | 'InputObject',
+> = Kind extends 'Arg'
+  ? ArgumentRef<Types, T>
+  : Kind extends 'InputObject'
+  ? InputFieldRef<Types, T>
+  : never;
+
+export interface GenericFieldRef<T = unknown> {
+  [outputFieldShapeKey]: T;
+}
+
+export interface GenericInputFieldRef<T = unknown> {
+  [inputFieldShapeKey]: T;
+}

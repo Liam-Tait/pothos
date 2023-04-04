@@ -6,6 +6,6 @@ export default class MutationFieldBuilder<
   ParentShape,
 > extends RootFieldBuilder<Types, ParentShape, 'Mutation'> {
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
-    super('Mutation', builder, 'Mutation', 'Object');
+    super(builder, 'Mutation', 'Object');
   }
 }

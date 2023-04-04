@@ -1,14 +1,15 @@
+import ArgumentRef from '../refs/arg';
 import InputFieldRef from '../refs/input-field';
 import InputListRef from '../refs/input-list';
 import type {
   ArgBuilder,
   FieldRequiredness,
+  InputOrArgRef,
   InputShapeFromTypeParam,
   InputTypeParam,
   NormalizeArgs,
 } from '../types';
 import { InputType, SchemaTypes } from '../types';
-import { inputTypeFromParam } from '../utils';
 
 export default class InputFieldBuilder<
   Types extends SchemaTypes,
@@ -17,8 +18,6 @@ export default class InputFieldBuilder<
   builder: PothosSchemaTypes.SchemaBuilder<Types>;
 
   kind: Kind;
-
-  typename: string;
 
   /**
    * Create a Boolean input field
@@ -80,10 +79,9 @@ export default class InputFieldBuilder<
    */
   stringList = this.helper(['String']);
 
-  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, kind: Kind, typename: string) {
+  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, kind: Kind) {
     this.builder = builder;
     this.kind = kind;
-    this.typename = typename;
   }
 
   listRef = <T extends InputTypeParam<Types>, Required extends boolean = true>(
@@ -120,36 +118,15 @@ export default class InputFieldBuilder<
    */
   field<Type extends InputType<Types> | [InputType<Types>], Req extends FieldRequiredness<Type>>(
     options: PothosSchemaTypes.InputFieldOptionsByKind<Types, Type, Req>[Kind],
-  ): InputFieldRef<InputShapeFromTypeParam<Types, Type, Req>, Kind> {
-    const ref: InputFieldRef<InputShapeFromTypeParam<Types, Type, Req>, Kind> = new InputFieldRef(
-      this.kind,
-      this.typename,
-    );
+  ): InputOrArgRef<Types, InputShapeFromTypeParam<Types, Type, Req>, Kind> {
+    const ref =
+      this.kind === 'Arg'
+        ? new ArgumentRef(this.builder, options as PothosSchemaTypes.ArgFieldOptions<Types>)
+        : new InputFieldRef(this.builder, options as PothosSchemaTypes.InputFieldOptions<Types>);
 
-    this.builder.configStore.addFieldRef(
-      ref,
-      options.type,
-      {},
-      (name, parentField, typeConfig) => ({
-        name,
-        parentField,
-        kind: this.kind,
-        graphqlKind: this.kind,
-        parentType: typeConfig.name,
-        type: inputTypeFromParam<Types>(
-          options.type,
-          this.builder.configStore,
-          options.required ?? this.builder.defaultInputFieldRequiredness,
-        ),
-        pothosOptions: options as unknown as PothosSchemaTypes.InputFieldOptionsByKind<Types>[Kind],
-        description: options.description,
-        deprecationReason: options.deprecationReason,
-        defaultValue: options.defaultValue,
-        extensions: options.extensions,
-      }),
-    );
+    this.builder.configStore.addFieldRef(ref, options.type, {});
 
-    return ref;
+    return ref as InputOrArgRef<Types, InputShapeFromTypeParam<Types, Type, Req>, Kind>;
   }
 
   private helper<Type extends InputType<Types> | [InputType<Types>]>(type: Type) {

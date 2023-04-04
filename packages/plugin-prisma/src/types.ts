@@ -1,5 +1,6 @@
 import { FieldNode, GraphQLResolveInfo } from 'graphql';
 import {
+  ArgumentRef,
   FieldKind,
   FieldMap,
   FieldNullability,
@@ -344,11 +345,12 @@ type CursorFromRelation<
   : never;
 
 type RefForRelation<
+  Types extends SchemaTypes,
   Model extends PrismaModelTypes,
   Field extends keyof Model['Relations'],
 > = Model['Relations'][Field] extends unknown[]
-  ? [ObjectRef<Model['Relations'][Field]>]
-  : ObjectRef<Model['Relations'][Field]>;
+  ? [ObjectRef<Types, Model['Relations'][Field]>]
+  : ObjectRef<Types, Model['Relations'][Field]>;
 
 export type RelatedFieldOptions<
   Types extends SchemaTypes,
@@ -363,7 +365,7 @@ export type RelatedFieldOptions<
   PothosSchemaTypes.ObjectFieldOptions<
     Types,
     Shape,
-    RefForRelation<Model, Field>,
+    RefForRelation<Types, Model, Field>,
     Nullable,
     Args,
     ResolveReturnShape
@@ -394,14 +396,14 @@ export type RelatedFieldOptions<
         >;
       }) & {
     description?: string | false;
-    type?: PrismaObjectRef<TypesForRelation<Types, Model, Field>>;
+    type?: PrismaObjectRef<Types, TypesForRelation<Types, Model, Field>>;
     query?: QueryForField<Types, Args, Model['Include'][Field & keyof Model['Include']]>;
   };
 
 export type VariantFieldOptions<
   Types extends SchemaTypes,
   Model extends PrismaModelTypes,
-  Variant extends PrismaObjectRef<Model>,
+  Variant extends PrismaObjectRef<Types, Model>,
   Args extends InputFieldMap,
   isNull,
   Shape,
@@ -458,10 +460,10 @@ export type PrismaFieldOptions<
   Types extends SchemaTypes,
   ParentShape,
   Type extends
-    | PrismaObjectRef<PrismaModelTypes>
+    | PrismaObjectRef<Types, PrismaModelTypes>
     | keyof Types['PrismaTypes']
     | [keyof Types['PrismaTypes']]
-    | [PrismaObjectRef<PrismaModelTypes>],
+    | [PrismaObjectRef<Types, PrismaModelTypes>],
   Model extends PrismaModelTypes,
   Param extends TypeParam<Types>,
   Args extends InputFieldMap,
@@ -491,13 +493,13 @@ export type PrismaFieldWithInputOptions<
   Types extends SchemaTypes,
   ParentShape,
   Kind extends FieldKind,
-  Args extends Record<string, InputFieldRef<unknown, 'Arg'>>,
-  Fields extends Record<string, InputFieldRef<unknown, 'InputObject'>>,
+  Args extends Record<string, ArgumentRef<Types, unknown>>,
+  Fields extends Record<string, InputFieldRef<Types, unknown>>,
   Type extends
-    | PrismaObjectRef<PrismaModelTypes>
+    | PrismaObjectRef<Types, PrismaModelTypes>
     | keyof Types['PrismaTypes']
     | [keyof Types['PrismaTypes']]
-    | [PrismaObjectRef<PrismaModelTypes>],
+    | [PrismaObjectRef<Types, PrismaModelTypes>],
   Model extends PrismaModelTypes,
   Param extends TypeParam<Types>,
   Nullable extends FieldNullability<Param>,
@@ -513,7 +515,8 @@ export type PrismaFieldWithInputOptions<
     Model,
     Param,
     {
-      [K in InputName]: InputFieldRef<
+      [K in InputName]: ArgumentRef<
+        Types,
         InputShapeFromFields<Fields> | (true extends ArgRequired ? never : null | undefined)
       >;
     } & Args,
@@ -527,7 +530,8 @@ export type PrismaFieldWithInputOptions<
   PothosSchemaTypes.FieldWithInputBaseOptions<
     Types,
     {
-      [K in InputName]: InputFieldRef<
+      [K in InputName]: ArgumentRef<
+        Types,
         InputShapeFromFields<Fields> | (true extends ArgRequired ? never : null | undefined)
       >;
     } & Args,
@@ -562,7 +566,7 @@ export type PrismaFieldResolver<
 export type PrismaConnectionFieldOptions<
   Types extends SchemaTypes,
   ParentShape,
-  Type extends PrismaObjectRef<PrismaModelTypes> | keyof Types['PrismaTypes'],
+  Type extends PrismaObjectRef<Types, PrismaModelTypes> | keyof Types['PrismaTypes'],
   Model extends PrismaModelTypes,
   Param extends OutputType<Types>,
   Nullable extends boolean,
@@ -589,7 +593,7 @@ export type PrismaConnectionFieldOptions<
       Param,
       Nullable,
       (InputFieldMap extends Args ? {} : Args) &
-        InputFieldsFromShape<PothosSchemaTypes.DefaultConnectionArguments>,
+        InputFieldsFromShape<Types, PothosSchemaTypes.DefaultConnectionArguments, 'InputObject'>,
       Kind,
       ParentShape,
       ResolveReturnShape
@@ -639,10 +643,10 @@ export type RelatedConnectionOptions<
   PothosSchemaTypes.ObjectFieldOptions<
     Types,
     Model['Shape'],
-    ObjectRef<unknown>,
+    ObjectRef<Types, unknown>,
     Nullable,
     (InputFieldMap extends Args ? {} : Args) &
-      InputFieldsFromShape<PothosSchemaTypes.DefaultConnectionArguments>,
+      InputFieldsFromShape<Types, PothosSchemaTypes.DefaultConnectionArguments, 'InputObject'>,
     unknown
   >,
   'resolve' | 'type' | 'args' | 'description'
@@ -651,7 +655,7 @@ export type RelatedConnectionOptions<
     PothosSchemaTypes.ConnectionFieldOptions<
       Types,
       Model['Shape'],
-      ObjectRef<unknown>,
+      ObjectRef<Types, unknown>,
       false,
       false,
       Nullable,
@@ -665,7 +669,7 @@ export type RelatedConnectionOptions<
     ? {
         description?: string | false;
         query?: QueryForField<Types, Args, Model['Include'][Field & keyof Model['Include']]>;
-        type?: PrismaObjectRef<TypesForRelation<Types, Model, Field>>;
+        type?: PrismaObjectRef<Types, TypesForRelation<Types, Model, Field>>;
         cursor: CursorFromRelation<Model, Field>;
         defaultSize?: number | ((args: ConnectionArgs, ctx: Types['Context']) => number);
         maxSize?: number | ((args: ConnectionArgs, ctx: Types['Context']) => number);
@@ -686,7 +690,7 @@ export type RelatedConnectionOptions<
             ) => MaybePromise<
               ShapeFromTypeParam<
                 Types,
-                [ObjectRef<Model['Relations'][Field & keyof Model['Relations']]['Shape']>],
+                [ObjectRef<Types, Model['Relations'][Field & keyof Model['Relations']]['Shape']>],
                 Nullable
               >
             >;
@@ -706,7 +710,7 @@ export type RelatedConnectionOptions<
             ) => MaybePromise<
               ShapeFromTypeParam<
                 Types,
-                [ObjectRef<Model['Relations'][Field & keyof Model['Relations']]['Shape']>],
+                [ObjectRef<Types, Model['Relations'][Field & keyof Model['Relations']]['Shape']>],
                 Nullable
               >
             >;

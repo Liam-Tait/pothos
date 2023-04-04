@@ -1,7 +1,7 @@
 // @ts-nocheck
 import './global-types.ts';
 import { defaultFieldResolver, getNamedType, GraphQLEnumType, GraphQLInputObjectType, GraphQLInputType, GraphQLInterfaceType, GraphQLNamedInputType, GraphQLNamedOutputType, GraphQLNamedType, GraphQLObjectType, GraphQLOutputType, GraphQLUnionType, isEnumType, isInputObjectType, isInterfaceType, isListType, isNonNullType, isObjectType, isScalarType, isUnionType, } from 'https://cdn.skypack.dev/graphql?dts';
-import SchemaBuilder, { createContextCache, EnumRef, EnumValueConfigMap, InputFieldRef, InputType, InputTypeParam, ObjectParam, ObjectRef, OutputType, SchemaTypes, TypeParam, } from '../core/index.ts';
+import SchemaBuilder, { ArgumentRef, createContextCache, EnumRef, EnumValueConfigMap, InputFieldRef, InputType, InputTypeParam, ObjectParam, ObjectRef, OutputType, SchemaTypes, TypeParam, } from '../core/index.ts';
 import { AddGraphQLEnumTypeOptions, AddGraphQLInputTypeOptions, AddGraphQLInterfaceTypeOptions, AddGraphQLObjectTypeOptions, AddGraphQLUnionTypeOptions, EnumValuesWithShape, } from './types.ts';
 const proto = SchemaBuilder.prototype as PothosSchemaTypes.SchemaBuilder<SchemaTypes>;
 export const referencedTypes = createContextCache(() => new Set<GraphQLNamedType>());
@@ -109,7 +109,7 @@ proto.addGraphQLObject = function addGraphQLObject<Shape>(type: GraphQLObjectTyp
                     }
                     return;
                 }
-                const args: Record<string, InputFieldRef> = {};
+                const args: Record<string, ArgumentRef<SchemaTypes>> = {};
                 for (const { name, ...arg } of field.args) {
                     const input = resolveInputType(this, arg.type);
                     args[name] = t.arg({
@@ -167,7 +167,7 @@ proto.addGraphQLInterface = function addGraphQLInterface<Shape = unknown>(type: 
                     }
                     return;
                 }
-                const args: Record<string, InputFieldRef> = {};
+                const args: Record<string, ArgumentRef<SchemaTypes>> = {};
                 for (const { name, ...arg } of field.args) {
                     args[name] = t.arg({
                         ...resolveInputType(this, arg.type),
@@ -190,7 +190,7 @@ proto.addGraphQLInterface = function addGraphQLInterface<Shape = unknown>(type: 
     });
     return ref;
 };
-proto.addGraphQLUnion = function addGraphQLUnion<Shape>(type: GraphQLUnionType, { types, extensions, ...options }: AddGraphQLUnionTypeOptions<SchemaTypes, ObjectRef<Shape>>) {
+proto.addGraphQLUnion = function addGraphQLUnion<Shape>(type: GraphQLUnionType, { types, extensions, ...options }: AddGraphQLUnionTypeOptions<SchemaTypes, ObjectRef<SchemaTypes, Shape>>) {
     return this.unionType<ObjectParam<SchemaTypes>, Shape>(options?.name ?? type.name, {
         ...options,
         description: type.description ?? undefined,
@@ -211,7 +211,7 @@ proto.addGraphQLEnum = function addGraphQLEnum<Shape extends string | number>(ty
             };
             return acc;
         }, {});
-    const ref: EnumRef<Shape> = this.enumType<never, EnumValuesWithShape<SchemaTypes, Shape>>((options?.name ?? type.name) as never, {
+    const ref: EnumRef<SchemaTypes, Shape> = this.enumType<never, EnumValuesWithShape<SchemaTypes, Shape>>((options?.name ?? type.name) as never, {
         ...options,
         description: type.description ?? undefined,
         extensions: { ...type.extensions, ...extensions },
@@ -227,7 +227,7 @@ proto.addGraphQLInput = function addGraphQLInput<Shape extends {}>(type: GraphQL
         extensions: { ...type.extensions, ...extensions },
         fields: (t) => {
             const existingFields = type.getFields();
-            const newFields: Record<string, InputFieldRef<unknown, "InputObject"> | null> = fields?.(t) ?? {};
+            const newFields: Record<string, InputFieldRef<SchemaTypes, unknown> | null> = fields?.(t) ?? {};
             const combinedFields: typeof newFields = {
                 ...newFields,
             };

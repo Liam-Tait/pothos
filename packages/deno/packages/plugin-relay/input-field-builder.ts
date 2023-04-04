@@ -11,8 +11,7 @@ inputFieldBuilder.globalIDList = function globalIDList<Req extends FieldRequired
         extensions: {
             ...options.extensions,
             isRelayGlobalID: true,
-            relayGlobalIDFor: ((forTypes &&
-                (Array.isArray(forTypes) ? forTypes : [forTypes])) as ObjectRef<SchemaTypes>[])?.map((type: ObjectRef<SchemaTypes>) => ({
+            relayGlobalIDFor: ((forTypes && (Array.isArray(forTypes) ? forTypes : [forTypes])) as ObjectRef<SchemaTypes, unknown>[])?.map((type: ObjectRef<SchemaTypes, unknown>) => ({
                 typename: this.builder.configStore.getTypeConfig(type).name,
                 parseId: "parseId" in type ? type.parseId : undefined,
             })) ?? null,
@@ -25,19 +24,18 @@ inputFieldBuilder.globalID = function globalID<Req extends boolean>({ for: forTy
         extensions: {
             ...options.extensions,
             isRelayGlobalID: true,
-            relayGlobalIDFor: ((forTypes &&
-                (Array.isArray(forTypes) ? forTypes : [forTypes])) as ObjectRef<SchemaTypes>[])?.map((type: ObjectRef<SchemaTypes>) => ({
+            relayGlobalIDFor: ((forTypes && (Array.isArray(forTypes) ? forTypes : [forTypes])) as ObjectRef<SchemaTypes, unknown>[])?.map((type: ObjectRef<SchemaTypes, unknown>) => ({
                 typename: this.builder.configStore.getTypeConfig(type).name,
                 parseId: "parseId" in type ? type.parseId : undefined,
             })) ?? null,
         },
-    }) as unknown as InputFieldRef<InputShapeFromTypeParam<DefaultSchemaTypes, GlobalIDInputShape, Req>> as never;
+    }) as unknown as InputFieldRef<SchemaTypes, InputShapeFromTypeParam<DefaultSchemaTypes, GlobalIDInputShape, Req>> as never;
 };
 inputFieldBuilder.connectionArgs = function connectionArgs() {
     const { cursorType = "String", beforeArgOptions = {} as never, afterArgOptions = {} as never, firstArgOptions = {} as never, lastArgOptions = {} as never, } = this.builder.options.relay ?? {};
     return {
-        before: this.field({ ...beforeArgOptions, type: cursorType, required: false }) as InputFieldRef<string | null>,
-        after: this.field({ ...afterArgOptions, type: cursorType, required: false }) as InputFieldRef<string | null>,
+        before: this.field({ ...beforeArgOptions, type: cursorType, required: false }),
+        after: this.field({ ...afterArgOptions, type: cursorType, required: false }),
         first: this.int({ ...firstArgOptions, required: false }),
         last: this.int({ ...lastArgOptions, required: false }),
     };

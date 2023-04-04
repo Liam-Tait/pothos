@@ -45,7 +45,7 @@ fieldBuilderProto.loadable = function loadable<
   Key,
   CacheKey,
   FieldKind
->): FieldRef<unknown> {
+>): FieldRef<SchemaTypes, unknown> {
   const getLoader = dataloaderGetter<
     Key,
     LoaderShapeFromType<SchemaTypes, Type, Nullable>,
@@ -108,7 +108,7 @@ fieldBuilderProto.loadableList = function loadableList<
   Key,
   CacheKey,
   FieldKind
->): FieldRef<unknown> {
+>): FieldRef<SchemaTypes, unknown> {
   const getLoader = dataloaderGetter<
     Key,
     ShapeFromTypeParam<SchemaTypes, [Type], Nullable>,

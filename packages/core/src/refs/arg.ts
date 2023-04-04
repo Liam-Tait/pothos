@@ -3,10 +3,10 @@ import { PothosSchemaError } from '../errors';
 import { inputFieldShapeKey, PothosFieldConfig, PothosTypeConfig, SchemaTypes } from '../types';
 import { inputTypeFromParam } from '../utils';
 
-export default class InputFieldRef<Types extends SchemaTypes, T = unknown> {
+export default class ArgumentRef<Types extends SchemaTypes, T = unknown> {
   builder: SchemaBuilder<Types>;
 
-  kind = 'InputObject' as const;
+  kind = 'Arg' as const;
 
   fieldName?: string;
 
@@ -16,22 +16,22 @@ export default class InputFieldRef<Types extends SchemaTypes, T = unknown> {
 
   constructor(
     builder: SchemaBuilder<Types>,
-
-    options: PothosSchemaTypes.InputObjectFieldOptions<Types> | null = null,
+    options: PothosSchemaTypes.ArgFieldOptions<Types> | null = null,
   ) {
     this.builder = builder;
-
     this.options = options;
   }
 
-  getConfig(name: string, typeConfig: PothosTypeConfig): PothosFieldConfig<Types> {
+  getConfig(name: string, field: string, typeConfig: PothosTypeConfig): PothosFieldConfig<Types> {
     if (!this.options) {
-      throw new PothosSchemaError(`Field ${typeConfig.name}.${name} has not been implemented`);
+      throw new PothosSchemaError(
+        `Argument ${name} of field ${typeConfig.name}.${field} has not been implemented`,
+      );
     }
 
     return {
       name,
-      parentField: undefined,
+      parentField: field,
       kind: this.kind,
       graphqlKind: this.kind,
       parentType: typeConfig.name,

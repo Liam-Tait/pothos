@@ -6,6 +6,6 @@ export default class SubscriptionFieldBuilder<
   ParentShape,
 > extends RootFieldBuilder<Types, ParentShape, 'Subscription'> {
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
-    super('Subscription', builder, 'Subscription', 'Object');
+    super(builder, 'Subscription', 'Object');
   }
 }

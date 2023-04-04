@@ -175,7 +175,7 @@ declare global {
             >;
           }
         >,
-      ) => FieldRef<ShapeFromTypeParam<Types, Type, Nullable>, Kind>;
+      ) => FieldRef<Types, ShapeFromTypeParam<Types, Type, Nullable>, Kind>;
     }
 
     export interface QueryFieldBuilder<Types extends SchemaTypes, ParentShape> {

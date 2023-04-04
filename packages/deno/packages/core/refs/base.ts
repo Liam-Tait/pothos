@@ -1,5 +1,6 @@
 // @ts-nocheck
-export default class BaseTypeRef implements PothosSchemaTypes.BaseTypeRef {
+import { SchemaTypes } from '../types/index.ts';
+export default class BaseTypeRef<Types extends SchemaTypes> implements PothosSchemaTypes.BaseTypeRef<Types> {
     kind;
     name;
     constructor(kind: "Enum" | "InputObject" | "Interface" | "Object" | "Scalar" | "Union" | "List" | "InputList", name: string) {

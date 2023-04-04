@@ -52,7 +52,7 @@ schemaBuilderProto.prismaObject = function prismaObject(
       ? () =>
           fields(
             new PrismaObjectFieldBuilder(
-              name,
+              ref.name,
               this,
               type,
               getRelationMap(getDMMF(this)).get(type)!,
@@ -66,7 +66,7 @@ schemaBuilderProto.prismaObject = function prismaObject(
 
 schemaBuilderProto.prismaNode = function prismaNode(
   this: PothosSchemaTypes.SchemaBuilder<SchemaTypes> & {
-    nodeInterfaceRef?: () => InterfaceRef<unknown>;
+    nodeInterfaceRef?: () => InterfaceRef<SchemaTypes, unknown>;
   },
   type: keyof SchemaTypes['PrismaTypes'],
   {
@@ -138,7 +138,7 @@ schemaBuilderProto.prismaNode = function prismaNode(
       (t) =>
         (
           t as unknown as {
-            globalID: (options: Record<string, unknown>) => FieldRef<unknown>;
+            globalID: (options: Record<string, unknown>) => FieldRef<SchemaTypes, unknown>;
           }
         ).globalID({
           ...(this.options as { relayOptions?: { idFieldOptions?: {} } }).relayOptions

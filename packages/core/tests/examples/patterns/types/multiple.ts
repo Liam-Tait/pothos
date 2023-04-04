@@ -1,8 +1,10 @@
-import { ArgBuilder, ObjectRef } from '../../../../src';
+import { ArgBuilder, ObjectRef, SchemaTypes } from '../../../../src';
 import InputFieldBuilder from '../../../../src/fieldUtils/input';
 import builder, { TypesWithDefault } from '../builder';
 
-function addCommonFields(refs: ObjectRef<unknown, { id: string }>[]) {
+function addCommonFields<Types extends SchemaTypes>(
+  refs: ObjectRef<Types, unknown, { id: string }>[],
+) {
   for (const ref of refs) {
     builder.objectFields(ref, (t) => ({
       id: t.exposeID('id', {}),

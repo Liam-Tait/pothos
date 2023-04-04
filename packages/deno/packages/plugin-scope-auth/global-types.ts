@@ -60,7 +60,7 @@ declare global {
             authField: <Args extends InputFieldMap, Type extends TypeParam<Types>, Scopes extends FieldAuthScopes<Types, ParentShape, InputShapeFromFields<Args>>, ResolveShape, ResolveReturnShape, Nullable extends FieldNullability<Type> = Types["DefaultFieldNullability"]>(options: Normalize<Omit<FieldOptionsFromKind<Types, ParentShape, Type, Nullable, Args, Kind, ResolveShape, ResolveReturnShape>, "resolve"> & {
                 authScopes: Scopes;
                 resolve: Resolver<Types["Root"], InputShapeFromFields<Args>, ContextForAuth<Types, Scopes>, ShapeFromTypeParam<Types, Type, Nullable>, ResolveReturnShape>;
-            }>) => FieldRef<ShapeFromTypeParam<Types, Type, Nullable>, Kind>;
+            }>) => FieldRef<Types, ShapeFromTypeParam<Types, Type, Nullable>, Kind>;
         }
         export interface QueryFieldBuilder<Types extends SchemaTypes, ParentShape> {
             withAuth: <Scopes extends FieldAuthScopes<Types, ParentShape, Record<string, unknown>>>(scopes: Scopes) => QueryFieldBuilder<ReplaceContext<Types, ContextForAuth<Types, Scopes> & object>, ParentShape>;

@@ -118,11 +118,11 @@ export type PrismaWhereFieldType<
   Model extends PrismaModelTypes,
   K extends keyof Model['Where'],
 > = K extends Model['RelationName']
-  ? InputRef<Model['Where'][K]> | InputFieldRef<Model['Where'][K]>
+  ? InputRef<Model['Where'][K]> | InputFieldRef<Types, Model['Where'][K]>
   :
       | InputWithShape<Types, Model['Where'][K]>
       | InputRef<Model['Where'][K]>
-      | InputFieldRef<Model['Where'][K] | null | undefined>;
+      | InputFieldRef<Types, Model['Where'][K] | null | undefined>;
 
 export type PrismaWhereUniqueFieldType<
   Types extends SchemaTypes,
@@ -131,11 +131,11 @@ export type PrismaWhereUniqueFieldType<
 > =
   | InputWithShape<Types, Model['Shape'][K]>
   | InputRef<Model['WhereUnique'][K]>
-  | InputFieldRef<Model['WhereUnique'][K] | null | undefined>;
+  | InputFieldRef<Types, Model['WhereUnique'][K] | null | undefined>;
 
 type InputWithShape<Types extends SchemaTypes, T> =
   | InputRef<T>
-  | InputFieldRef<T | null | undefined>
+  | InputFieldRef<Types, T | null | undefined>
   | (BaseEnum & Record<string, T>)
   | (new (...args: any[]) => T)
   | (keyof Types['inputShapes'] extends infer U

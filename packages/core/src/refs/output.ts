@@ -1,7 +1,7 @@
-import { outputShapeKey, parentShapeKey } from '../types';
+import { outputShapeKey, parentShapeKey, SchemaTypes } from '../types';
 import BaseTypeRef from './base';
 
-export default class OutputTypeRef<T, P = T> extends BaseTypeRef {
+export default class OutputTypeRef<Types extends SchemaTypes, T, P = T> extends BaseTypeRef<Types> {
   override kind;
 
   [outputShapeKey]!: T;
