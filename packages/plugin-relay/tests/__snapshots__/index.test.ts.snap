@@ -280,12 +280,30 @@ interface Node {
   id: ID!
 }
 
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
 type Query {
   \\"\\"\\"node query\\"\\"\\"
   node(id: ID!): Node
 
   \\"\\"\\"nodes query\\"\\"\\"
   nodes(ids: [ID!]!): [Node]!
+  nullConnection(after: String, before: String, first: Int, last: Int): QueryNullConnection!
+}
+
+type QueryNullConnection {
+  edges: [QueryNullConnectionEdge]
+  pageInfo: PageInfo!
+}
+
+type QueryNullConnectionEdge {
+  cursor: String!
+  node: Boolean!
 }
 
 interface User {
@@ -381,7 +399,7 @@ type Poll implements Node {
 
 type PollAnswersCon {
   edges: [PollAnswersConEdge!]!
-  nodes: [Answer!]!
+  nodes: [Answer]!
   pageInfo: PageInfo!
   totalCount: Int!
   totalCount2: Int!
@@ -394,7 +412,7 @@ type PollAnswersConEdge {
 
 type PollAnswersConnection {
   edges: [PollAnswersConnectionEdge!]!
-  nodes: [Answer!]!
+  nodes: [Answer]!
   pageInfo: PageInfo!
   totalCount: Int!
   totalCount2: Int!
@@ -407,7 +425,7 @@ type PollAnswersConnectionEdge {
 
 type PollAnswersUsingOffsetConnection {
   edges: [PollAnswersUsingOffsetConnectionEdge!]!
-  nodes: [Answer!]!
+  nodes: [Answer]!
   pageInfo: PageInfo!
   totalCount: Int!
   totalCount2: Int!
@@ -435,7 +453,7 @@ type Query {
 
 type QueryBatchNumbersConnection {
   edges: [QueryBatchNumbersConnectionEdge!]!
-  nodes: [BatchNumber!]!
+  nodes: [BatchNumber]!
   pageInfo: PageInfo!
   totalCount: Int!
   totalCount2: Int!
@@ -448,7 +466,7 @@ type QueryBatchNumbersConnectionEdge {
 
 type QueryNullableNumbersConnection {
   edges: [QueryNullableNumbersConnectionEdge!]!
-  nodes: [Number!]!
+  nodes: [Number]!
   other: String!
   pageInfo: PageInfo!
   totalCount: Int!
@@ -462,7 +480,7 @@ type QueryNullableNumbersConnectionEdge {
 
 type QueryNumbersConnection {
   edges: [QueryNumbersConnectionEdge!]!
-  nodes: [Number!]!
+  nodes: [Number]!
   other: String!
   pageInfo: PageInfo!
   totalCount: Int!
@@ -490,7 +508,7 @@ type QueryOddNumbersConnectionEdge {
 type QueryPollsConnection {
   edges: [QueryPollsConnectionEdge!]!
   extraConnectionField: String!
-  nodes: [Poll!]!
+  nodes: [Poll]!
   pageInfo: PageInfo!
   totalCount: Int!
   totalCount2: Int!
@@ -504,7 +522,7 @@ type QueryPollsConnectionEdge {
 
 type SharedConnection {
   edges: [SharedEdge!]!
-  nodes: [Number!]!
+  nodes: [Number]!
   pageInfo: PageInfo!
   totalCount: Int!
   totalCount2: Int!

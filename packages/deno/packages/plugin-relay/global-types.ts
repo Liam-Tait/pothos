@@ -26,7 +26,10 @@ declare global {
             Connection: PartialTypes["Connection"] & {};
             DefaultEdgesNullability: FieldNullability<[
                 unknown
-            ]> extends PartialTypes["DefaultEdgesNullability"] ? DefaultEdgesNullability : PartialTypes["DefaultEdgesNullability"] & FieldNullability<[
+            ]> extends PartialTypes["DefaultEdgesNullability"] ? PartialTypes["Defaults"] extends "v3" ? {
+                list: false;
+                items: true;
+            } : DefaultEdgesNullability : PartialTypes["DefaultEdgesNullability"] & FieldNullability<[
                 unknown
             ]>;
             DefaultNodeNullability: boolean extends PartialTypes["DefaultNodeNullability"] ? false : PartialTypes["DefaultNodeNullability"] & boolean;

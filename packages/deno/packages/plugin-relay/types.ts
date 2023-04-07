@@ -61,6 +61,11 @@ export type RelayPluginOptions<Types extends SchemaTypes> = EmptyToOptional<{
     ], Types["DefaultEdgesNullability"], {}, unknown[]>, "args" | "resolve" | "nullable" | "type"> & {
         nullable?: Types["DefaultEdgesNullability"];
     };
+    nodesFieldOptions: Omit<PothosSchemaTypes.ObjectFieldOptions<Types, {}, [
+        ObjectRef<Types, {}>
+    ], FieldNullability<[
+        unknown
+    ]>, {}, unknown[]>, "args" | "resolve" | "type">;
     pageInfoFieldOptions: Omit<PothosSchemaTypes.ObjectFieldOptions<Types, {}, OutputRef<PageInfoShape>, boolean, {}, PageInfoShape>, "args" | "resolve" | "type">;
     hasNextPageFieldOptions: Omit<PothosSchemaTypes.ObjectFieldOptions<Types, PageInfoShape, "Boolean", boolean, {}, boolean>, "args" | "resolve" | "type">;
     hasPreviousPageFieldOptions: Omit<PothosSchemaTypes.ObjectFieldOptions<Types, PageInfoShape, "Boolean", boolean, {}, boolean>, "args" | "resolve" | "type">;
@@ -91,8 +96,7 @@ export type RelayPluginOptions<Types extends SchemaTypes> = EmptyToOptional<{
     }, {}, GlobalIDShape<Types> | string>, "args" | "nullable" | "resolve" | "type">;
 }>;
 export interface DefaultEdgesNullability {
-    // TODO(breaking) according to the spec, this should be nullable
-    list: false;
+    list: true;
     items: true;
 }
 export interface PageInfoShape {

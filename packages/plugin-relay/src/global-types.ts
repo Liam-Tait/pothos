@@ -73,7 +73,9 @@ declare global {
       DefaultEdgesNullability: FieldNullability<
         [unknown]
       > extends PartialTypes['DefaultEdgesNullability']
-        ? DefaultEdgesNullability
+        ? PartialTypes['Defaults'] extends 'v3'
+          ? { list: false; items: true }
+          : DefaultEdgesNullability
         : PartialTypes['DefaultEdgesNullability'] & FieldNullability<[unknown]>;
       DefaultNodeNullability: boolean extends PartialTypes['DefaultNodeNullability']
         ? false

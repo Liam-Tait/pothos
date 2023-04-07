@@ -14,7 +14,5 @@ export default new SchemaBuilder<{
 }>({
   defaults: 'v3',
   plugins: [RelayPlugin, ComplexityPlugin],
-  relayOptions: {
-    // clientMutationId: 'required',
-  },
+  relayOptions: {},
 });

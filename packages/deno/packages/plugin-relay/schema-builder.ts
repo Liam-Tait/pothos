@@ -411,97 +411,72 @@ schemaBuilderProto.relayMutationField = function relayMutationField(fieldName, i
     payloadType: payloadRef,
   } as never;
 };
-schemaBuilderProto.connectionObject = function connectionObject(
-  {
-    type,
-    name: connectionName,
-    edgesNullable: edgesNullableField,
-    nodeNullable,
-    edgesField,
-    ...connectionOptions
-  },
-  edgeOptionsOrRef,
-) {
-  verifyRef(type);
-  const {
-    edgesFieldOptions: {
-      nullable: edgesNullable = { items: true, list: false },
-      ...edgesFieldOptions
-    } = {} as never,
-    pageInfoFieldOptions = {} as never,
-  } = this.options.relay ?? {};
-  const connectionRef =
-    this.objectRef<ConnectionShape<SchemaTypes, unknown, false>>(connectionName);
-  const edgeRef =
-    edgeOptionsOrRef instanceof ObjectRef
-      ? edgeOptionsOrRef
-      : this.edgeObject({
-          name: `${connectionName.replace(/Connection$/, '')}Edge`,
-          ...edgeOptionsOrRef,
-          nodeNullable,
-          type,
+schemaBuilderProto.connectionObject = function connectionObject({ type, name: connectionName, edgesNullable: edgesNullableField, nodeNullable, edgesField, ...connectionOptions }, edgeOptionsOrRef) {
+    verifyRef(type);
+    const { edgesFieldOptions: { nullable: edgesNullable = { items: true, list: true }, ...edgesFieldOptions } = {} as never, pageInfoFieldOptions = {} as never, } = this.options.relay ?? {};
+    const connectionRef = this.objectRef<ConnectionShape<SchemaTypes, unknown, false>>(connectionName);
+    const edgeRef = edgeOptionsOrRef instanceof ObjectRef
+        ? edgeOptionsOrRef
+        : this.edgeObject({
+            name: `${connectionName.replace(/Connection$/, "")}Edge`,
+            ...edgeOptionsOrRef,
+            nodeNullable,
+            type,
         });
-  const connectionFields = connectionOptions.fields as unknown as
-    | ObjectFieldsShape<SchemaTypes, ConnectionShape<SchemaTypes, unknown, false>>
-    | undefined;
-  const { nodesOnConnection } = this.options.relay ?? {};
-  const edgesNullableOption = edgesNullableField ?? edgesNullable;
-  const edgeListNullable =
-    typeof edgesNullableOption === 'object' ? edgesNullableOption.list : !!edgesNullableOption;
-  const edgeItemsNullable =
-    typeof edgesNullableOption === 'object' && 'items' in (edgesNullableOption as {})
-      ? edgesNullableOption.items
-      : false;
-  this.objectType(connectionRef, {
-    ...(this.options.relay?.defaultConnectionTypeOptions as {}),
-    ...(connectionOptions as {}),
-    fields: (t) => ({
-      pageInfo: t.field({
-        nullable: false,
-        ...pageInfoFieldOptions,
-        type: this.pageInfoRef(),
-        resolve: (parent) => parent.pageInfo,
-      }),
-      edges: t.field({
-        nullable: (edgesNullableField ?? edgesNullable) as {
-          list: false;
-          items: true;
-        },
-        ...edgesFieldOptions,
-        ...edgesField,
-        type: [edgeRef],
-        resolve: (parent) => parent.edges as [],
-      }),
-      ...(nodesOnConnection
-        ? {
-            nodes: t.field({
-              ...(typeof nodesOnConnection === 'object' ? nodesOnConnection : {}),
-              type: [type],
-              nullable: {
-                list: edgeListNullable,
-                items:
-                  edgeItemsNullable ??
-                  nodeNullable ??
-                  this.options.relay?.nodeFieldOptions?.nullable ??
-                  false,
-              },
-              resolve: (con) =>
-                completeValue(
-                  con.edges,
-                  (edges) => edges?.map((e) => e?.node) ?? (edgeListNullable ? null : []),
-                ) as never,
+    const connectionFields = connectionOptions.fields as unknown as ObjectFieldsShape<SchemaTypes, ConnectionShape<SchemaTypes, unknown, false>> | undefined;
+    const { nodesOnConnection } = this.options.relay ?? {};
+    const edgesNullableOption = edgesNullableField ?? edgesNullable;
+    const edgeListNullable = !!((typeof edgesNullableOption === "object" ? edgesNullableOption.list : edgesNullableOption) ??
+        true);
+    const edgeItemsNullable = typeof edgesNullableOption === "object" && "items" in (edgesNullableOption as {})
+        ? edgesNullableOption.items
+        : this.options.relay?.nodeFieldOptions?.nullable ?? true;
+    this.objectType(connectionRef, {
+        ...(this.options.relay?.defaultConnectionTypeOptions as {}),
+        ...(connectionOptions as {}),
+        fields: (t) => ({
+            pageInfo: t.field({
+                nullable: false,
+                ...pageInfoFieldOptions,
+                type: this.pageInfoRef(),
+                resolve: (parent) => parent.pageInfo,
             }),
-          }
-        : {}),
-      ...connectionFields?.(t as never),
-    }),
-  });
-  if (!connectionRefs.has(this)) {
-    connectionRefs.set(this, []);
-  }
-  connectionRefs.get(this)!.push(connectionRef);
-  globalConnectionFieldsMap.get(this)?.forEach((fieldFn) => void fieldFn(connectionRef));
-  return connectionRef as never;
+            edges: t.field({
+                nullable: (edgesNullableField ?? edgesNullable) as {
+                    list: true;
+                    items: true;
+                },
+                ...edgesFieldOptions,
+                ...edgesField,
+                type: [edgeRef],
+                resolve: (parent) => parent.edges as [
+                ],
+            }),
+            ...(nodesOnConnection
+                ? {
+                    nodes: t.field({
+                        ...(typeof nodesOnConnection === "object" ? nodesOnConnection : {}),
+                        type: [type],
+                        nullable: {
+                            list: edgeListNullable,
+                            items: edgeItemsNullable ??
+                                nodeNullable ??
+                                this.options.relay?.nodeFieldOptions?.nullable ??
+                                true,
+                        },
+                        resolve: (con) => completeValue(con.edges, (edges) => edges?.map((e) => e?.node) ?? (edgeListNullable ? null : [])) as never,
+                    }),
+                }
+                : {}),
+            ...connectionFields?.(t as never),
+        }),
+    });
+    if (!connectionRefs.has(this)) {
+        connectionRefs.set(this, []);
+    }
+    connectionRefs.get(this)!.push(connectionRef);
+    globalConnectionFieldsMap.get(this)?.forEach((fieldFn) => void fieldFn(connectionRef));
+    return connectionRef as never;
 };
 schemaBuilderProto.edgeObject = function edgeObject({ type, name: edgeName, nodeNullable: nodeFieldNullable, nodeField, ...edgeOptions }) {
     verifyRef(type);

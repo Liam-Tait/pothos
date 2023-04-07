@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-interface */
 import type { GraphQLDirective } from 'graphql';
 import type { PluginConstructorMap } from '../plugins';
-import type { DefaultScalars, MergedScalars, SchemaTypes, V3DefaultScalars } from '../schema-types';
+import type {
+  DefaultsByVersion,
+  DefaultScalars,
+  MergedScalars,
+  SchemaTypes,
+  V3DefaultScalars,
+} from '../schema-types';
 import type { IsStrictMode } from '../utils';
 
 declare global {
@@ -22,8 +28,8 @@ declare global {
 
     export interface V3SchemaBuilderOptions<Types extends SchemaTypes> {}
 
-    export interface VersionedSchemaBuilderOptions<Types extends SchemaTypes> {
-      v3: V3SchemaBuilderOptions<Types>;
+    export interface V3DefaultSchemaTypes {
+      Scalars: V3DefaultScalars;
     }
 
     export interface BuildSchemaOptions<Types extends SchemaTypes> {
@@ -47,7 +53,7 @@ declare global {
     }
 
     export interface UserSchemaTypes {
-      Defaults: keyof DefaultsByVersion;
+      Defaults: 'v3' | 'v4';
       Scalars: Record<
         string,
         {
@@ -61,15 +67,6 @@ declare global {
       Context: object;
       DefaultFieldNullability: boolean;
       DefaultInputFieldRequiredness: boolean;
-    }
-
-    export interface DefaultsByVersion {
-      v3: {
-        Scalars: V3DefaultScalars;
-      };
-      v4: {
-        Scalars: DefaultScalars;
-      };
     }
 
     export interface ExtendDefaultTypes<PartialTypes extends Partial<UserSchemaTypes>>

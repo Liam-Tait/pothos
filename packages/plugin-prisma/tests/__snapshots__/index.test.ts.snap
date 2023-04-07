@@ -30,7 +30,7 @@ type Comment {
 }
 
 type CommentConnection {
-  edges: [CommentEdge]!
+  edges: [CommentEdge]
   pageInfo: PageInfo!
 }
 
@@ -66,7 +66,7 @@ type Media {
 }
 
 type MediaConnection {
-  edges: [MediaEdge]!
+  edges: [MediaEdge]
   pageInfo: PageInfo!
 }
 
@@ -113,7 +113,7 @@ type Post {
 }
 
 type PostManualMediaConnection {
-  edges: [PostManualMediaConnectionEdge]!
+  edges: [PostManualMediaConnectionEdge]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -125,7 +125,7 @@ type PostManualMediaConnectionEdge {
 }
 
 type PostOwnCommentsConnection {
-  edges: [PostOwnCommentsConnectionEdge]!
+  edges: [PostOwnCommentsConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -175,7 +175,7 @@ type Query {
 }
 
 type QueryManualConnection {
-  edges: [QueryManualConnectionEdge]!
+  edges: [QueryManualConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -185,7 +185,7 @@ type QueryManualConnectionEdge {
 }
 
 type QueryNamedConnection {
-  edges: [QueryNamedConnectionEdge]!
+  edges: [QueryNamedConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -195,7 +195,7 @@ type QueryNamedConnectionEdge {
 }
 
 type QueryPostsBigIntCursorConnection {
-  edges: [QueryPostsBigIntCursorConnectionEdge]!
+  edges: [QueryPostsBigIntCursorConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -205,7 +205,7 @@ type QueryPostsBigIntCursorConnectionEdge {
 }
 
 type QueryUnrelatedConnection {
-  edges: [QueryUnrelatedConnectionEdge]!
+  edges: [QueryUnrelatedConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -215,7 +215,7 @@ type QueryUnrelatedConnectionEdge {
 }
 
 type QueryUserConnection {
-  edges: [QueryUserConnectionEdge]!
+  edges: [QueryUserConnectionEdge]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -226,7 +226,7 @@ type QueryUserConnectionEdge {
 }
 
 type QueryUserConnectionWithErrorsConnection {
-  edges: [QueryUserConnectionWithErrorsConnectionEdge]!
+  edges: [QueryUserConnectionWithErrorsConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -248,7 +248,7 @@ type QueryUsersWithErrorSuccess {
 }
 
 type QueryWithCompositeConnection {
-  edges: [QueryWithCompositeConnectionEdge]!
+  edges: [QueryWithCompositeConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -258,7 +258,7 @@ type QueryWithCompositeConnectionEdge {
 }
 
 type QueryWithIDSelectConnection {
-  edges: [QueryWithIDSelectConnectionEdge]!
+  edges: [QueryWithIDSelectConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -290,7 +290,7 @@ type SelectUser implements Node {
 }
 
 type SelectUserFollowingConnection {
-  edges: [SelectUserFollowingConnectionEdge]!
+  edges: [SelectUserFollowingConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -300,7 +300,7 @@ type SelectUserFollowingConnectionEdge {
 }
 
 type SelectUserPostsConnection {
-  edges: [SelectUserPostsConnectionEdge]!
+  edges: [SelectUserPostsConnectionEdge]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -338,7 +338,7 @@ type User implements Named & Node {
 }
 
 type UserCommentedPostsConnection {
-  edges: [UserCommentedPostsConnectionEdge]!
+  edges: [UserCommentedPostsConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -348,7 +348,7 @@ type UserCommentedPostsConnectionEdge {
 }
 
 type UserCommentsConnection {
-  edges: [UserCommentsConnectionEdge]!
+  edges: [UserCommentsConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -365,7 +365,7 @@ type UserFollow {
 }
 
 type UserFollowingConnection {
-  edges: [UserFollowingConnectionEdge]!
+  edges: [UserFollowingConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -377,7 +377,7 @@ type UserFollowingConnectionEdge {
 union UserOrProfile = Profile | User
 
 type UserPostsConnection {
-  edges: [UserPostsConnectionEdge]!
+  edges: [UserPostsConnectionEdge]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -388,7 +388,7 @@ type UserPostsConnectionEdge {
 }
 
 type UserPostsConnectionWithErrorsConnection {
-  edges: [UserPostsConnectionWithErrorsConnectionEdge]!
+  edges: [UserPostsConnectionWithErrorsConnectionEdge]
   pageInfo: PageInfo!
 }
 
@@ -404,7 +404,7 @@ type UserPostsConnectionWithErrorsSuccess {
 }
 
 type UserPostsSkipConnection {
-  edges: [UserPostsSkipConnectionEdge]!
+  edges: [UserPostsSkipConnectionEdge]
   pageInfo: PageInfo!
   totalCount: Int!
 }
@@ -432,7 +432,7 @@ type Viewer {
 }
 
 type ViewerCommentsConnection {
-  edges: [ViewerCommentsConnectionEdge]!
+  edges: [ViewerCommentsConnectionEdge]
   pageInfo: PageInfo!
 }
 

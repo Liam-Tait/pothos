@@ -159,6 +159,17 @@ export type RelayPluginOptions<Types extends SchemaTypes> = EmptyToOptional<{
   > & {
     nullable?: Types['DefaultEdgesNullability'];
   };
+  nodesFieldOptions: Omit<
+    PothosSchemaTypes.ObjectFieldOptions<
+      Types,
+      {},
+      [ObjectRef<Types, {}>],
+      FieldNullability<[unknown]>,
+      {},
+      unknown[]
+    >,
+    'args' | 'resolve' | 'type'
+  >;
   pageInfoFieldOptions: Omit<
     PothosSchemaTypes.ObjectFieldOptions<
       Types,
@@ -268,8 +279,7 @@ export type RelayPluginOptions<Types extends SchemaTypes> = EmptyToOptional<{
 }>;
 
 export interface DefaultEdgesNullability {
-  // TODO(breaking) according to the spec, this should be nullable
-  list: false;
+  list: true;
   items: true;
 }
 

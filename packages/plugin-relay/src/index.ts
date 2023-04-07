@@ -95,6 +95,10 @@ SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin, {
         options.relayOptions?.edgeCursorType ?? options.relayOptions?.cursorType ?? 'String',
       pageInfoCursorType:
         options.relayOptions?.pageInfoCursorType ?? options.relayOptions?.cursorType ?? 'String',
+      edgesFieldOptions: {
+        ...options.relayOptions.edgesFieldOptions,
+        nullable: options.relayOptions.edgesFieldOptions?.nullable ?? { list: false, items: true },
+      },
     },
   }),
 });
