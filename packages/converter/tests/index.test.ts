@@ -15,6 +15,7 @@ async function execTS(script: string) {
     const chunks: Buffer[] = [];
     const child = spawn('node', {
       stdio: ['pipe', 'pipe', 'inherit'],
+      // eslint-disable-next-line unicorn/prefer-module
       cwd: __dirname,
     });
 

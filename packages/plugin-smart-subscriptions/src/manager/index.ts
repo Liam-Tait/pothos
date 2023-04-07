@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-throw-literal */
 /* eslint-disable no-await-in-loop */
 import { RegisterOptions } from '../types';
 
@@ -103,7 +104,8 @@ export default class SubscriptionManager implements AsyncIterator<object> {
     };
   }
 
-  async throw(error: unknown) {
+  // eslint-disable-next-line @typescript-eslint/promise-function-async
+  throw(error: unknown) {
     this.handleError(error);
 
     return Promise.reject<IteratorResult<object>>(error);
@@ -231,7 +233,7 @@ export default class SubscriptionManager implements AsyncIterator<object> {
     for (const options of optionsList) {
       const currentAllowed = !options.filter || options.filter(value);
 
-      allowed = allowed || currentAllowed;
+      allowed ||= currentAllowed;
 
       if (currentAllowed && options.onValue) {
         const promise = options.onValue(value);
