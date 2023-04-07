@@ -39,7 +39,7 @@ function normalizeInputObject(object: unknown): unknown {
   return mapped;
 }
 
-export class PrismaUtilsPlugin<Types extends SchemaTypes> extends BasePlugin<Types> {
+export class PothosPrismaUtilsPlugin<Types extends SchemaTypes> extends BasePlugin<Types> {
   constructor(cache: BuildCache<Types>) {
     super(cache, pluginName);
   }
@@ -70,4 +70,4 @@ export class PrismaUtilsPlugin<Types extends SchemaTypes> extends BasePlugin<Typ
   }
 }
 
-SchemaBuilder.registerPlugin(pluginName, PrismaUtilsPlugin);
+SchemaBuilder.registerPlugin(pluginName, PothosPrismaUtilsPlugin);

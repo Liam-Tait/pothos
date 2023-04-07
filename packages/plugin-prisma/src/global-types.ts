@@ -33,12 +33,12 @@ import {
   ShapeFromSelection,
 } from './types';
 
-import type { PrismaPlugin } from '.';
+import type { PothosPrismaPlugin } from '.';
 
 declare global {
   export namespace PothosSchemaTypes {
     export interface Plugins<Types extends SchemaTypes> {
-      prisma: PrismaPlugin<Types>;
+      prisma: PothosPrismaPlugin<Types>;
     }
 
     export interface SchemaBuilderOptions<Types extends SchemaTypes> {

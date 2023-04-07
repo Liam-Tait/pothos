@@ -22,12 +22,12 @@ import {
   ScalarListOps,
 } from './types';
 
-import type { PrismaUtilsPlugin } from '.';
+import type { PothosPrismaUtilsPlugin } from '.';
 
 declare global {
   export namespace PothosSchemaTypes {
     export interface Plugins<Types extends SchemaTypes> {
-      prismaUtils: PrismaUtilsPlugin<Types>;
+      prismaUtils: PothosPrismaUtilsPlugin<Types>;
     }
 
     export interface SchemaBuilder<Types extends SchemaTypes> {
