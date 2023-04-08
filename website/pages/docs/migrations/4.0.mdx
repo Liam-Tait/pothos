@@ -212,3 +212,69 @@ consistent with options for other plugins.
 +  validation: {...}
  })
 ```
+
+# Plugin API and Type changes
+
+Unlike the defaults and config changes, the changes to the types and classes used throughout Pothos
+can't be easily made backwards compatbile with the 3.x releases. Below is a summary of the main
+changes made to the types and classes that may be used by plugins, helpers, or other libraries. Many
+of these types and classes are primarily intended for internal use, and should not affect most
+applications using pothos, but the changes are documented here to help upgrades for those of you
+building your own plugins, or using these types in your applications.
+
+The 4.0 release is intended to allow pothos to become more modular and extensible. This requires
+Refs and many associated type helerps to propagate the SchemaTypes from the builder that originated
+them, meaning most of the changes listed below are adding `Types extends SchemaTypes` as the first
+generic argument to the type.
+
+## Classes
+
+- `InputFieldBuilder`
+  - Removed the `typename` argument from the constructor
+  - Updated field methods to return a new `GenericInputRef`
+- `InterfaceFieldBuilder`
+  - Removed the `typename` argument from the constructor
+- `ObjectFieldBuilder`
+  - Removed the `typename` argument from the constructor
+- `BaseTypeRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `EnumTypeRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `InputObjectRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `InputRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `OutputTypeRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `ListRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `InterfaceRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `ObjectRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `ScalarRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `UnionRef`
+  - Added `SchemaTypes` as a new Generic paramater
+- `FieldRef`
+  - Added `SchemaTypes` as a new Generic paramater
+  - removed the typename from constructor args
+  - add the builder and Field options as arguments for the constructor
+- `InputFieldRef`
+  - Added `SchemaTypes` as a new Generic paramater
+  - removed the typename and kind from constructor args
+  - add the builder and Field options as arguments for the constructor
+  - split argument refs into a new `ArgumentRef` class
+
+## Exported types
+
+- `*FieldThunk`
+  - Updated to return a `GenericFieldRef<unknown>`
+- `FieldMap`
+  - Updated to `Record<string, GenericFieldRef<unknown>>;`
+- `InputFieldMap`
+  - Updated to `Record<string, GenericInputFieldRef<unknown>>;`
+- `InputFieldsFromShape`
+  - Added `SchemaTypes` as a new Generic paramater
+- `InputShapeFromField`
+  - Updated to accept a `GenericFieldRef`
