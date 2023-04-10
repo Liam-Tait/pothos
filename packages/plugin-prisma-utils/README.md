@@ -1,6 +1,6 @@
 # Prisma utils for Pothos
 
-This package is highly experimental and not recommended for production use
+<Alert>This package is highly experimental and not recommended for production use</Alert>
 
 The plugin adds new helpers for creating prisma compatible input types. It is NOT required to use
 the normal prisma plugin.
@@ -65,7 +65,7 @@ operations).
 
 ```typescript
 const StringFilter = builder.prismaFilter('String', {
-  ops: ['contains', 'equals', 'startsWith', 'not', 'equals'],
+  ops: ['contains', 'equals', 'startsWith', 'not'],
 });
 
 export const IDFilter = builder.prismaFilter('Int', {
@@ -268,7 +268,7 @@ There are 2 main approaches:
 2. Dynamic Generation: Types are generated dynamically at runtime through helpers imported from your
    App
 
-### Static generator:
+### Static generator
 
 You can find an
 [example static generator here](https://github.com/hayes/pothos/blob/main/packages/plugin-prisma-utils/tests/examples/codegen/generator.ts)
