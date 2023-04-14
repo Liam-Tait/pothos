@@ -18,8 +18,8 @@ export class PrismaObjectRef<
   [abstractReturnShapeKey]!: WithBrand<T>;
   modelName: string;
 
-  constructor(name: string, modelName: string) {
-    super(name);
+  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string, modelName: string) {
+    super(builder, name);
 
     this.modelName = modelName;
   }

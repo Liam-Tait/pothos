@@ -1,9 +1,9 @@
-import { SchemaTypes } from '../types';
+import type { PothosUnionTypeConfig, SchemaTypes } from '../types';
 import { OutputRef, outputShapeKey, parentShapeKey } from '../types/type-params';
 import BaseTypeRef from './base';
 
 export default class UnionRef<Types extends SchemaTypes, T, P = T>
-  extends BaseTypeRef<Types>
+  extends BaseTypeRef<Types, PothosUnionTypeConfig>
   implements OutputRef, PothosSchemaTypes.UnionRef<Types, T, P>
 {
   override kind = 'Union' as const;
@@ -11,7 +11,7 @@ export default class UnionRef<Types extends SchemaTypes, T, P = T>
   [outputShapeKey]!: T;
   [parentShapeKey]!: P;
 
-  constructor(name: string) {
-    super('Union', name);
+  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string) {
+    super(builder, 'Union', name);
   }
 }

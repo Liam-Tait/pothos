@@ -111,7 +111,11 @@ schemaBuilderProto.loadableUnion = function loadableUnion<
 ) {
   const getDataloader = dataloaderGetter<Key, Shape, CacheKey>(loaderOptions, load, toKey, sort);
 
-  const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(name, getDataloader);
+  const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(
+    this,
+    name,
+    getDataloader,
+  );
 
   this.unionType(name, {
     ...options,

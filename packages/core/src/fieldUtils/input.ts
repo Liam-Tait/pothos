@@ -89,6 +89,7 @@ export default class InputFieldBuilder<
     options?: { required?: Required },
   ): InputListRef<Types, InputShapeFromTypeParam<Types, T, Required>[]> =>
     new InputListRef<Types, InputShapeFromTypeParam<Types, T, Required>[]>(
+      this.builder,
       type,
       options?.required ?? true,
     );

@@ -1,4 +1,5 @@
 import './global-types';
+import { defaultFieldResolver } from 'graphql';
 import SchemaBuilder, {
   BasePlugin,
   FieldMap,
@@ -32,7 +33,7 @@ proto.simpleObject = function simpleObject<
   name: string,
   options: PothosSchemaTypes.SimpleObjectTypeOptions<SchemaTypes, Interfaces, Fields, Shape>,
 ) {
-  const ref = new ObjectRef<SchemaTypes, Shape>(name);
+  const ref = new ObjectRef<SchemaTypes, Shape>(this, name);
 
   if (options.fields) {
     const originalFields = options.fields;
@@ -45,8 +46,7 @@ proto.simpleObject = function simpleObject<
         this.configStore.onFieldUse(fields[key], (config) => {
           if (config.kind === 'Object') {
             // eslint-disable-next-line no-param-reassign
-            config.resolve = (parent) =>
-              (parent as Record<string, unknown>)[key] as Readonly<unknown>;
+            config.resolve = defaultFieldResolver;
           }
         });
       });
@@ -68,7 +68,7 @@ proto.simpleInterface = function simpleInterface<
   name: string,
   options: PothosSchemaTypes.SimpleInterfaceTypeOptions<SchemaTypes, Fields, Shape, Interfaces>,
 ) {
-  const ref = new InterfaceRef<SchemaTypes, Shape>(name);
+  const ref = new InterfaceRef<SchemaTypes, Shape>(this, name);
 
   if (options.fields) {
     const originalFields = options.fields;
@@ -81,8 +81,7 @@ proto.simpleInterface = function simpleInterface<
         this.configStore.onFieldUse(fields[key], (config) => {
           if (config.kind === 'Interface') {
             // eslint-disable-next-line no-param-reassign
-            config.resolve = (parent) =>
-              (parent as Record<string, unknown>)[key] as Readonly<unknown>;
+            config.resolve = defaultFieldResolver;
           }
         });
       });

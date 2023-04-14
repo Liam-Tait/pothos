@@ -138,14 +138,16 @@ export const InputFieldBuilder = InternalInputFieldBuilder as new <
   typename: string,
 ) => PothosSchemaTypes.InputFieldBuilder<Types, Kind>;
 
-export type BaseTypeRef<Types extends SchemaTypes> = PothosSchemaTypes.BaseTypeRef<Types>;
-export const BaseTypeRef = InternalBaseTypeRef as new <Types extends SchemaTypes>(
+export type BaseTypeRef<Types extends SchemaTypes, T> = PothosSchemaTypes.BaseTypeRef<Types, T>;
+export const BaseTypeRef = InternalBaseTypeRef as new <Types extends SchemaTypes, T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   kind: 'Enum' | 'InputObject' | 'Interface' | 'Object' | 'Scalar' | 'Union',
   name: string,
-) => PothosSchemaTypes.BaseTypeRef<Types>;
+) => PothosSchemaTypes.BaseTypeRef<Types, T>;
 
 export type EnumRef<Types extends SchemaTypes, T, P = T> = PothosSchemaTypes.EnumRef<Types, T, P>;
 export const EnumRef = InternalEnumRef as new <Types extends SchemaTypes, T, P = T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
 ) => PothosSchemaTypes.EnumRef<Types, T, P>;
 
@@ -154,11 +156,13 @@ export type InputObjectRef<Types extends SchemaTypes, T> = PothosSchemaTypes.Inp
   T
 >;
 export const InputObjectRef = InternalInputObjectRef as new <Types extends SchemaTypes, T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
 ) => PothosSchemaTypes.InputObjectRef<Types, T>;
 
 export type InputListRef<Types extends SchemaTypes, T> = PothosSchemaTypes.InputListRef<Types, T>;
 export const InputListRef = InternalInputListRef as new <Types extends SchemaTypes, T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
   required: boolean,
 ) => PothosSchemaTypes.InputListRef<Types, T>;
@@ -169,6 +173,7 @@ export type InterfaceRef<Types extends SchemaTypes, T, P = T> = PothosSchemaType
   P
 >;
 export const InterfaceRef = InternalInterfaceRef as new <Types extends SchemaTypes, T, P = T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
 ) => PothosSchemaTypes.InterfaceRef<Types, T, P>;
 
@@ -178,6 +183,7 @@ export type ObjectRef<Types extends SchemaTypes, T, P = T> = PothosSchemaTypes.O
   P
 >;
 export const ObjectRef = InternalObjectRef as new <Types extends SchemaTypes, T, P = T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
 ) => PothosSchemaTypes.ObjectRef<Types, T, P>;
 
@@ -188,16 +194,19 @@ export type ScalarRef<Types extends SchemaTypes, T, U, P = T> = PothosSchemaType
   P
 >;
 export const ScalarRef = InternalScalarRef as new <Types extends SchemaTypes, T, U, P = T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
 ) => PothosSchemaTypes.ScalarRef<Types, T, U, P>;
 
 export type UnionRef<Types extends SchemaTypes, T, P = T> = PothosSchemaTypes.UnionRef<Types, T, P>;
 export const UnionRef = InternalUnionRef as new <Types extends SchemaTypes, T, P = T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
 ) => PothosSchemaTypes.UnionRef<Types, T, P>;
 
 export type ListRef<Types extends SchemaTypes, T, P = T> = PothosSchemaTypes.ListRef<Types, T, P>;
 export const ListRef = InternalListRef as new <Types extends SchemaTypes, T, P = T>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
   name: string,
   nullable: boolean,
 ) => PothosSchemaTypes.ListRef<Types, T, P>;

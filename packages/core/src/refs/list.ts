@@ -13,8 +13,12 @@ export default class ListRef<Types extends SchemaTypes, T, P = T>
   listType: TypeParam<Types>;
   nullable: boolean;
 
-  constructor(listType: TypeParam<Types>, nullable: boolean) {
-    super('List', `List<${String(listType)}>`);
+  constructor(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
+    listType: TypeParam<Types>,
+    nullable: boolean,
+  ) {
+    super(builder, 'List', `List<${String(listType)}>`);
     this.listType = listType;
     this.nullable = nullable;
   }

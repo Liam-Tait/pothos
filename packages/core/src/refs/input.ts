@@ -6,8 +6,12 @@ export default class InputTypeRef<Types extends SchemaTypes, T> extends BaseType
 
   [inputShapeKey]!: T;
 
-  constructor(kind: 'Enum' | 'InputObject' | 'Scalar', name: string) {
-    super(kind, name);
+  constructor(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
+    kind: 'Enum' | 'InputObject' | 'Scalar',
+    name: string,
+  ) {
+    super(builder, kind, name);
     this.kind = kind;
   }
 }

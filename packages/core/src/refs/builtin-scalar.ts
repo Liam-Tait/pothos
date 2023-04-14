@@ -9,8 +9,8 @@ export default class BuiltinScalarRef<Types extends SchemaTypes, T, U> extends S
 > {
   type;
 
-  constructor(type: GraphQLScalarType) {
-    super(type.name);
+  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, type: GraphQLScalarType) {
+    super(builder, type.name);
 
     this.type = type;
   }

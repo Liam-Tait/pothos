@@ -7,8 +7,12 @@ export default class OutputTypeRef<Types extends SchemaTypes, T, P = T> extends 
   [outputShapeKey]!: T;
   [parentShapeKey]!: P;
 
-  constructor(kind: 'Enum' | 'Interface' | 'Object' | 'Scalar' | 'Union', name: string) {
-    super(kind, name);
+  constructor(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
+    kind: 'Enum' | 'Interface' | 'Object' | 'Scalar' | 'Union',
+    name: string,
+  ) {
+    super(builder, kind, name);
     this.kind = kind;
   }
 }

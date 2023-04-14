@@ -417,6 +417,7 @@ export default class RootFieldBuilder<
     options?: { nullable?: Nullable },
   ): ListRef<Types, ShapeFromTypeParam<Types, T, Nullable>[]> {
     return new ListRef<Types, ShapeFromTypeParam<Types, T, Nullable>[]>(
+      this.builder,
       type,
       options?.nullable ?? false,
     );

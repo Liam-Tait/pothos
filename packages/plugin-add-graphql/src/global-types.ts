@@ -57,7 +57,7 @@ declare global {
       addGraphQLInput: <Shape extends {}>(
         type: GraphQLInputObjectType,
         options: AddGraphQLInputTypeOptions<Types, Shape>,
-      ) => InputTypeRef<Types, Shape>;
+      ) => InputObjectRef<Types, Shape>;
     }
   }
 }

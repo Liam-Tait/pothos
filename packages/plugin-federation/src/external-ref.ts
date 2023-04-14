@@ -25,7 +25,6 @@ export class ExternalEntityRef<
 > extends OutputTypeRef<Types, Shape> {
   override kind = 'Object' as const;
 
-  private builder: PothosSchemaTypes.SchemaBuilder<Types>;
   private key: Key | Key[];
   private resolveReference?: (
     parent: object,
@@ -43,9 +42,8 @@ export class ExternalEntityRef<
       info: GraphQLResolveInfo,
     ) => MaybePromise<Shape | null | undefined>,
   ) {
-    super('Object', name);
+    super(builder, 'Object', name);
 
-    this.builder = builder;
     this.key = key;
     this.resolveReference = resolveReference;
   }

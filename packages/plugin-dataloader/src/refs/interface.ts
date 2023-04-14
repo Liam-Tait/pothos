@@ -20,10 +20,11 @@ export class LoadableInterfaceRef<
   getDataloader;
 
   constructor(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
     name: string,
     getDataloader: (context: Types['Context']) => DataLoader<Key, Shape, CacheKey>,
   ) {
-    super(name);
+    super(builder, name);
 
     this.getDataloader = getDataloader;
   }

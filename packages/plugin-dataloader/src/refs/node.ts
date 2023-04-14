@@ -35,7 +35,7 @@ export class ImplementableLoadableNodeRef<
     this.builder.configStore.onTypeConfig(this, (config) => {
       const nodeInterface = (
         this.builder as PothosSchemaTypes.SchemaBuilder<Types> & {
-          nodeInterfaceRef: () => InterfaceRef<Types, unknown>;
+          nodeInterfaceRef: () => InterfaceRef<SchemaTypes, unknown>;
         }
       ).nodeInterfaceRef();
 

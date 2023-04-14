@@ -111,7 +111,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
       return opts;
     }, options);
 
-    this.configStore = new ConfigStore<Types>();
+    this.configStore = new ConfigStore<Types>(this);
 
     this.defaultFieldNullability =
       (
@@ -152,7 +152,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
     param: Param,
     options: ObjectTypeOptions<Types, Param, ParentShape<Types, Param>, Interfaces>,
     fields?: ObjectFieldsShape<Types, ParentShape<Types, Param>>,
-  ) {
+  ): PothosSchemaTypes.ObjectRef<Types, OutputShape<Types, Param>, ParentShape<Types, Param>> {
     verifyRef(param);
     verifyInterfaces(options.interfaces);
 
@@ -168,7 +168,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
     const ref =
       param instanceof BaseTypeRef
         ? (param as ObjectRef<Types, OutputShape<Types, Param>, ParentShape<Types, Param>>)
-        : new ObjectRef<Types, OutputShape<Types, Param>, ParentShape<Types, Param>>(name);
+        : new ObjectRef<Types, OutputShape<Types, Param>, ParentShape<Types, Param>>(this, name);
 
     const config: PothosObjectTypeConfig = {
       kind: 'Object',
@@ -236,7 +236,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
       [options: PothosSchemaTypes.QueryTypeOptions<Types>, fields?: QueryFieldsShape<Types>],
       0
     >
-  ) {
+  ): PothosSchemaTypes.ObjectRef<Types, OutputShape<Types, 'Query'>, ParentShape<Types, 'Query'>> {
     const [options = {}, fields] = args;
     const config: PothosQueryTypeConfig = {
       kind: 'Query',
@@ -248,6 +248,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
     };
 
     const ref = new ObjectRef<Types, OutputShape<Types, 'Query'>, ParentShape<Types, 'Query'>>(
+      this,
       'Query',
     );
 
@@ -367,7 +368,11 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
     param: Param,
     options: InterfaceTypeOptions<Types, Param, ParentShape<Types, Param>, Interfaces, ResolveType>,
     fields?: InterfaceFieldsShape<Types, ParentShape<Types, Param>>,
-  ) {
+  ): PothosSchemaTypes.InterfaceRef<
+    Types,
+    AbstractReturnShape<Types, Param, ResolveType>,
+    ParentShape<Types, Param>
+  > {
     verifyRef(param);
     verifyInterfaces(options.interfaces);
 
@@ -387,7 +392,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
             Types,
             AbstractReturnShape<Types, Param, ResolveType>,
             ParentShape<Types, Param>
-          >(name);
+          >(this, name);
 
     const typename = ref.name;
 
@@ -449,11 +454,16 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
   unionType<Member extends ObjectParam<Types>, ResolveType>(
     name: string,
     options: PothosSchemaTypes.UnionTypeOptions<Types, Member, ResolveType>,
-  ) {
+  ): PothosSchemaTypes.UnionRef<
+    Types,
+    AbstractReturnShape<Types, Member, ResolveType>,
+    ParentShape<Types, Member>
+  > {
     const ref = new UnionRef<
+      Types,
       AbstractReturnShape<Types, Member, ResolveType>,
       ParentShape<Types, Member>
-    >(name);
+    >(this, name);
 
     if (Array.isArray(options.types)) {
       options.types.forEach((type) => {
@@ -481,13 +491,16 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
   enumType<Param extends EnumParam, Values extends EnumValues<Types>>(
     param: Param,
     options: EnumTypeOptions<Types, Param, Values>,
-  ) {
+  ): PothosSchemaTypes.EnumRef<
+    Types,
+    Param extends BaseEnum ? ValuesFromEnum<Param> : ShapeFromEnumValues<Types, Values>
+  > {
     verifyRef(param);
     const name = typeof param === 'string' ? param : (options as { name: string }).name;
     const ref = new EnumRef<
       Types,
       Param extends BaseEnum ? ValuesFromEnum<Param> : ShapeFromEnumValues<Types, Values>
-    >(name);
+    >(this, name);
 
     const values =
       typeof param === 'object'
@@ -522,8 +535,8 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
       InputShape<Types, Name>,
       ParentShape<Types, Name>
     >,
-  ) {
-    const ref = new ScalarRef<Types, InputShape<Types, Name>, ParentShape<Types, Name>>(name);
+  ): PothosSchemaTypes.ScalarRef<Types, InputShape<Types, Name>, ParentShape<Types, Name>> {
+    const ref = new ScalarRef<Types, InputShape<Types, Name>, ParentShape<Types, Name>>(this, name);
 
     const config: PothosScalarTypeConfig = {
       kind: 'Scalar',
@@ -578,7 +591,7 @@ export default class SchemaBuilder<Types extends SchemaTypes> {
 
     const ref = (
       typeof param === 'string'
-        ? new InputObjectRef<Types, InputShapeFromFields<Fields>>(name)
+        ? new InputObjectRef<Types, InputShapeFromFields<Fields>>(this, name)
         : param
     ) as PothosSchemaTypes.InputObjectRef<Types, InputShapeFromFields<Fields>>;
 
