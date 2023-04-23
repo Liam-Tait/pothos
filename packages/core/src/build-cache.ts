@@ -23,16 +23,15 @@ import {
   GraphQLTypeResolver,
   GraphQLUnionType,
 } from 'graphql';
-import type SchemaBuilder from './builder';
-import ConfigStore from './config-store';
+import type { SchemaBuilder } from './builder';
+import { ConfigStore } from './config-store';
 import { PothosError, PothosSchemaError } from './errors';
 import { BasePlugin, MergedPlugins } from './plugins';
-import BuiltinScalarRef from './refs/builtin-scalar';
+import { BuiltinScalarRef } from './refs/builtin-scalar';
 import { ImplementableInputObjectRef } from './refs/input-object';
 import {
   InputType,
   OutputType,
-  PluginMap,
   PothosEnumTypeConfig,
   PothosEnumValueConfig,
   PothosInputFieldConfig,
@@ -55,7 +54,7 @@ import {
 } from './types';
 import { assertNever, getTypeBrand, isThenable } from './utils';
 
-export default class BuildCache<Types extends SchemaTypes> {
+export class BuildCache<Types extends SchemaTypes> {
   types = new Map<string, GraphQLNamedType>();
 
   builder: PothosSchemaTypes.SchemaBuilder<Types>;
@@ -65,8 +64,6 @@ export default class BuildCache<Types extends SchemaTypes> {
   options: PothosSchemaTypes.BuildSchemaOptions<Types>;
 
   private configStore: ConfigStore<Types>;
-
-  private pluginMap: PluginMap<Types>;
 
   private pluginList: BasePlugin<Types>[];
 
@@ -109,8 +106,6 @@ export default class BuildCache<Types extends SchemaTypes> {
 
       return plugins[pluginName] as BasePlugin<Types>;
     });
-
-    this.pluginMap = plugins as PluginMap<Types>;
 
     this.plugin = new MergedPlugins(this, this.pluginList);
   }
@@ -155,11 +150,13 @@ export default class BuildCache<Types extends SchemaTypes> {
       return this.implementers.get(iface.name)!;
     }
 
-    const implementers = [...this.configStore.typeConfigs.values()].filter(
-      (type) =>
-        type.kind === 'Object' &&
-        type.interfaces.find((i) => this.configStore.getTypeConfig(i).name === iface.name),
-    ) as PothosObjectTypeConfig[];
+    const implementers = [...this.configStore.typeConfigs.values()]
+      .filter(
+        ({ config }) =>
+          config.kind === 'Object' &&
+          config.interfaces.find((i) => this.configStore.getTypeConfig(i).name === iface.name),
+      )
+      .map(({ config }) => config as PothosObjectTypeConfig);
 
     this.implementers.set(iface.name, implementers);
 
@@ -169,15 +166,15 @@ export default class BuildCache<Types extends SchemaTypes> {
   buildAll() {
     this.configStore.prepareForBuild();
 
-    this.configStore.typeConfigs.forEach((baseConfig) => {
-      if (baseConfig.kind === 'Enum' || baseConfig.kind === 'Scalar') {
-        this.buildTypeFromConfig(baseConfig);
+    this.configStore.typeConfigs.forEach(({ config }) => {
+      if (config.kind === 'Enum' || config.kind === 'Scalar') {
+        this.buildTypeFromConfig(config);
       }
     });
 
-    this.configStore.typeConfigs.forEach((baseConfig) => {
-      if (baseConfig.kind === 'InputObject') {
-        this.buildTypeFromConfig(baseConfig);
+    this.configStore.typeConfigs.forEach(({ config }) => {
+      if (config.kind === 'InputObject') {
+        this.buildTypeFromConfig(config);
       }
     });
 
@@ -187,31 +184,27 @@ export default class BuildCache<Types extends SchemaTypes> {
       }
     });
 
-    this.configStore.typeConfigs.forEach((baseConfig) => {
-      if (baseConfig.kind === 'Interface') {
-        this.buildTypeFromConfig(baseConfig);
+    this.configStore.typeConfigs.forEach(({ config }) => {
+      if (config.kind === 'Interface') {
+        this.buildTypeFromConfig(config);
       }
     });
 
-    this.configStore.typeConfigs.forEach((baseConfig) => {
-      if (baseConfig.kind === 'Object') {
-        this.buildTypeFromConfig(baseConfig);
+    this.configStore.typeConfigs.forEach(({ config }) => {
+      if (config.kind === 'Object') {
+        this.buildTypeFromConfig(config);
       }
     });
 
-    this.configStore.typeConfigs.forEach((baseConfig) => {
-      if (baseConfig.kind === 'Union') {
-        this.buildTypeFromConfig(baseConfig);
+    this.configStore.typeConfigs.forEach(({ config }) => {
+      if (config.kind === 'Union') {
+        this.buildTypeFromConfig(config);
       }
     });
 
-    this.configStore.typeConfigs.forEach((baseConfig) => {
-      if (
-        baseConfig.kind === 'Query' ||
-        baseConfig.kind === 'Mutation' ||
-        baseConfig.kind === 'Subscription'
-      ) {
-        this.buildTypeFromConfig(baseConfig);
+    this.configStore.typeConfigs.forEach(({ config }) => {
+      if (config.kind === 'Query' || config.kind === 'Mutation' || config.kind === 'Subscription') {
+        this.buildTypeFromConfig(config);
       }
     });
 

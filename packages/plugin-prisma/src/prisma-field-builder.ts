@@ -3,6 +3,7 @@
 import { FieldNode, GraphQLResolveInfo } from 'graphql';
 import {
   CompatibleTypes,
+  ExposeNullability,
   FieldKind,
   FieldRef,
   InputFieldMap,
@@ -77,6 +78,7 @@ export class PrismaObjectFieldBuilder<
   Shape extends object = Model['Shape'],
 > extends RootBuilder<Types, Shape, 'PrismaObject'> {
   model: string;
+  builder: PothosSchemaTypes.SchemaBuilder<Types>;
   prismaFieldMap: FieldMap;
 
   exposeBoolean = this.createExpose('Boolean');
@@ -216,7 +218,7 @@ export class PrismaObjectFieldBuilder<
     };
 
     const cursorSelection = ModelLoader.getCursorSelection(
-      ref,
+      ref as never,
       relationField.type,
       cursorValue,
       this.builder,
@@ -347,6 +349,7 @@ export class PrismaObjectFieldBuilder<
     this.model = model;
     this.prismaFieldMap = fieldMap;
     this.typename = typename;
+    this.builder = builder;
   }
 
   relation<
@@ -541,7 +544,12 @@ export class PrismaObjectFieldBuilder<
     return <
       Nullable extends boolean,
       ResolveReturnShape,
-      Name extends CompatibleTypes<Types, Model['Shape'], Type, Nullable>,
+      Name extends CompatibleTypes<
+        Types,
+        Model['Shape'],
+        Type,
+        Type extends [unknown] ? { list: true; items: true } : true
+      >,
     >(
       ...args: NormalizeArgs<
         [
@@ -556,22 +564,23 @@ export class PrismaObjectFieldBuilder<
               ResolveReturnShape
             >,
             'resolve' | 'type' | 'select' | 'description'
-          > & { description?: string | false },
+          > &
+            ExposeNullability<Types, Type, Model['Shape'], Name, Nullable> & {
+              description?: string | false;
+            },
         ]
       >
     ): FieldRef<Types, ShapeFromTypeParam<Types, Type, Nullable>, 'PrismaObject'> => {
       const [name, { description, ...options } = {} as never] = args;
 
-      return this.expose(name as never, {
-        ...options,
-        description: getFieldDescription(
-          this.model,
-          this.builder,
-          name as string,
-          description,
-        ) as never,
-        type,
-      });
+      return this.expose(
+        name as never,
+        {
+          ...options,
+          description: getFieldDescription(this.model, this.builder, name as string, description),
+          type,
+        } as never,
+      );
     };
   }
 }

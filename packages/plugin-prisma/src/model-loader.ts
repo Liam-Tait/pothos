@@ -10,7 +10,7 @@ import {
 
 export class ModelLoader {
   model: object;
-  builder: PothosSchemaTypes.SchemaBuilder<never>;
+  builder: PothosSchemaTypes.SchemaBuilder<SchemaTypes>;
   findUnique: (model: Record<string, unknown>, ctx: {}) => unknown;
   modelName: string;
 
@@ -21,7 +21,7 @@ export class ModelLoader {
 
   constructor(
     model: object,
-    builder: PothosSchemaTypes.SchemaBuilder<never>,
+    builder: PothosSchemaTypes.SchemaBuilder<SchemaTypes>,
     modelName: string,
     findUnique: (model: Record<string, unknown>, ctx: {}) => unknown,
   ) {

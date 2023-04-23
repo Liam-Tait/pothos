@@ -60,6 +60,7 @@ SchemaBuilder.registerPlugin(pluginName, PothosRelayPlugin, {
                 ...options.relayOptions.edgesFieldOptions,
                 nullable: options.relayOptions.edgesFieldOptions?.nullable ?? { list: false, items: true },
             },
+            brandLoadedObjects: options.relayOptions.brandLoadedObjects ?? false,
         },
     }),
 });

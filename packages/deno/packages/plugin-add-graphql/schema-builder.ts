@@ -191,6 +191,7 @@ proto.addGraphQLInterface = function addGraphQLInterface<Shape = unknown>(type: 
     return ref;
 };
 proto.addGraphQLUnion = function addGraphQLUnion<Shape>(type: GraphQLUnionType, { types, extensions, ...options }: AddGraphQLUnionTypeOptions<SchemaTypes, ObjectRef<SchemaTypes, Shape>>) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.unionType<ObjectParam<SchemaTypes>, Shape>(options?.name ?? type.name, {
         ...options,
         description: type.description ?? undefined,
@@ -219,7 +220,7 @@ proto.addGraphQLEnum = function addGraphQLEnum<Shape extends string | number>(ty
     } as never);
     return ref;
 };
-proto.addGraphQLInput = function addGraphQLInput<Shape extends {}>(type: GraphQLInputObjectType, { name = type.name, fields, extensions, ...options }: AddGraphQLInputTypeOptions<SchemaTypes, Shape>) {
+proto.addGraphQLInput = function addGraphQLInput<Shape extends {}>(type: GraphQLInputObjectType, { name = type.name, fields, extensions, ...options }: AddGraphQLInputTypeOptions<SchemaTypes, Shape>): PothosSchemaTypes.InputObjectRef<SchemaTypes, Shape> {
     const ref = this.inputRef<Shape>(name);
     return ref.implement({
         ...options,

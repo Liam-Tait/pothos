@@ -1,22 +1,23 @@
 import { PothosSchemaError } from '../errors';
 import type { SchemaTypes } from '../types';
 
-export default class BaseTypeRef<Types extends SchemaTypes, T = unknown>
+export class BaseTypeRef<Types extends SchemaTypes, T = unknown>
   implements PothosSchemaTypes.BaseTypeRef<Types, T>
 {
-  builder: PothosSchemaTypes.SchemaBuilder<Types>;
-
   kind;
 
   name;
 
-  config: T | null;
+  association: BaseTypeRef<Types, T> | string | null = null;
 
-  protected pendingActions: ((config: T) => T | void)[] = [];
-  private refs: (typeof this)[] = [];
+  protected pendingActions: ((
+    config: T,
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
+  ) => T | void)[] = [];
+
+  private createConfig: ((builder: PothosSchemaTypes.SchemaBuilder<Types>) => T) | null = null;
 
   constructor(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>,
     kind:
       | 'Enum'
       | 'InputObject'
@@ -27,62 +28,43 @@ export default class BaseTypeRef<Types extends SchemaTypes, T = unknown>
       | 'List'
       | 'InputList',
     name: string,
-    config: T | null = null,
   ) {
-    this.builder = builder;
     this.kind = kind;
     this.name = name;
-    this.config = config ?? null;
   }
 
   toString() {
     return `${this.kind}Ref<${this.name}>`;
   }
 
-  onConfig(cb: (config: T) => T | void) {
+  associate(ref: BaseTypeRef<Types, T> | string) {
+    if (this.association && typeof this.associate !== 'string') {
+      throw new PothosSchemaError(`${this} is already associated with ${this.association}`);
+    }
+
+    this.association = ref;
+  }
+
+  onConfig(cb: (config: T, builder: PothosSchemaTypes.SchemaBuilder<Types>) => T | void) {
     this.pendingActions.push(cb);
   }
 
-  toConfig() {
-    const { config, refs } = this.allRefs();
-
-    if (!config) {
+  toConfig(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
+    if (!this.createConfig) {
       throw new PothosSchemaError(`${this} has not been implemented`);
     }
 
-    let merged = config;
+    const config = this.createConfig(builder);
 
-    for (const ref of refs) {
-      for (const cb of ref.pendingActions) {
-        const next = cb(merged);
-
-        if (next) {
-          merged = next;
-        }
-      }
-    }
-
-    return merged;
+    return this.pendingActions.reduce((cfg, cb) => cb(cfg, builder) ?? cfg, config);
   }
 
-  private allRefs = (
-    refs = new Set<BaseTypeRef<Types, T>>(),
-  ): RefCollection<BaseTypeRef<Types, T>, T> => {
-    const config: T | null = null;
-
-    if (!refs.has(this)) {
-      refs.add(this);
-      this.refs.forEach((ref) => ref.allRefs(refs));
+  initConfig(configOrFn: T | ((builder: PothosSchemaTypes.SchemaBuilder<Types>) => T)) {
+    if (this.createConfig) {
+      throw new PothosSchemaError(`${this} has already been implemented`);
     }
 
-    return {
-      refs,
-      config,
-    };
-  };
-}
-
-interface RefCollection<T, C> {
-  refs: Set<T>;
-  config: C | null;
+    this.createConfig =
+      typeof configOrFn === 'function' ? (configOrFn as () => T) : () => configOrFn;
+  }
 }

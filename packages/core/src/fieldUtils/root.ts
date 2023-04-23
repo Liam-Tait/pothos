@@ -1,4 +1,4 @@
-import ListRef from '../refs/list';
+import { ListRef } from '../refs/list';
 import type { ArgBuilder, InputFieldMap, NormalizeArgs, ShapeFromTypeParam } from '../types';
 import {
   FieldKind,
@@ -7,15 +7,15 @@ import {
   SchemaTypes,
   TypeParam,
 } from '../types';
-import BaseFieldUtil from './base';
-import InputFieldBuilder from './input';
+import { BaseFieldUtil } from './base';
+import { InputFieldBuilder } from './input';
 
-export default class RootFieldBuilder<
+export class RootFieldBuilder<
   Types extends SchemaTypes,
   ParentShape,
   Kind extends FieldKind = FieldKind,
 > extends BaseFieldUtil<Types, ParentShape, Kind> {
-  arg: ArgBuilder<Types> = new InputFieldBuilder<Types, 'Arg'>(this.builder, 'Arg').argBuilder();
+  arg: ArgBuilder<Types> = new InputFieldBuilder<Types, 'Arg'>('Arg').argBuilder();
 
   /**
    * Create a Boolean field
@@ -398,16 +398,29 @@ export default class RootFieldBuilder<
     ResolveReturnShape,
     Nullable extends FieldNullability<Type> = Types['DefaultFieldNullability'],
   >(
-    options: FieldOptionsFromKind<
-      Types,
-      ParentShape,
-      Type,
-      Nullable,
-      Args,
-      Kind,
-      ResolveShape,
-      ResolveReturnShape
-    >,
+    options:
+      | FieldOptionsFromKind<
+          Types,
+          ParentShape,
+          Type,
+          Nullable,
+          Args,
+          Kind,
+          ResolveShape,
+          ResolveReturnShape
+        >
+      | ((
+          builder: PothosSchemaTypes.SchemaBuilder<Types>,
+        ) => FieldOptionsFromKind<
+          Types,
+          ParentShape,
+          Type,
+          Nullable,
+          Args,
+          Kind,
+          ResolveShape,
+          ResolveReturnShape
+        >),
   ) {
     return this.createField<Args, Type, Nullable>(options as never);
   }
@@ -417,7 +430,6 @@ export default class RootFieldBuilder<
     options?: { nullable?: Nullable },
   ): ListRef<Types, ShapeFromTypeParam<Types, T, Nullable>[]> {
     return new ListRef<Types, ShapeFromTypeParam<Types, T, Nullable>[]>(
-      this.builder,
       type,
       options?.nullable ?? false,
     );

@@ -6,9 +6,9 @@ import {
   PothosEnumTypeConfig,
   SchemaTypes,
 } from '../types';
-import BaseTypeRef from './base';
+import { BaseTypeRef } from './base';
 
-export default class EnumRef<Types extends SchemaTypes, T, U = T>
+export class EnumRef<Types extends SchemaTypes, T, U = T>
   extends BaseTypeRef<Types, PothosEnumTypeConfig>
   implements OutputRef, InputRef, PothosSchemaTypes.EnumRef<Types, T, U>
 {
@@ -18,11 +18,7 @@ export default class EnumRef<Types extends SchemaTypes, T, U = T>
 
   [inputShapeKey]!: U;
 
-  constructor(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>,
-    name: string,
-    config?: PothosEnumTypeConfig,
-  ) {
-    super(builder, 'Enum', name, config);
+  constructor(name: string) {
+    super('Enum', name);
   }
 }

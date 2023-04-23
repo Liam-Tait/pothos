@@ -11,13 +11,12 @@ export class NodeRef<Types extends SchemaTypes, T, P = T, IDShape = string> exte
   parseId: ((id: string, ctx: object) => IDShape) | undefined;
 
   constructor(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>,
     name: string,
     options: {
       parseId?: (id: string, ctx: object) => IDShape;
     },
   ) {
-    super(builder, name);
+    super(name);
     this.parseId = options.parseId;
   }
 }

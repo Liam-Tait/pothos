@@ -24,6 +24,7 @@ export class ExternalEntityRef<
   Key extends Selection<object>,
 > extends OutputTypeRef<Types, Shape> {
   override kind = 'Object' as const;
+  builder: PothosSchemaTypes.SchemaBuilder<Types>;
 
   private key: Key | Key[];
   private resolveReference?: (
@@ -42,8 +43,9 @@ export class ExternalEntityRef<
       info: GraphQLResolveInfo,
     ) => MaybePromise<Shape | null | undefined>,
   ) {
-    super(builder, 'Object', name);
+    super('Object', name);
 
+    this.builder = builder;
     this.key = key;
     this.resolveReference = resolveReference;
   }
@@ -62,10 +64,8 @@ export class ExternalEntityRef<
         { name: 'extends', args: {} },
       ]) as [],
       fields: (t) => ({
-        ...externalFields?.(
-          new RootFieldBuilder(this.builder, 'ExternalEntity', 'Object') as never,
-        ),
-        ...fields?.(new FieldBuilder(this.builder, 'ExtendedEntity', 'Object') as never),
+        ...externalFields?.(new RootFieldBuilder('ExternalEntity', 'Object') as never),
+        ...fields?.(new FieldBuilder('ExtendedEntity', 'Object') as never),
       }),
       extensions: {
         ...options.extensions,

@@ -309,7 +309,7 @@ schemaBuilderProto.node = function node(param, { interfaces, extensions, id, ...
     );
   });
 
-  const nodeRef = new NodeRef(this, ref.name, {
+  const nodeRef = new NodeRef(ref.name, {
     parseId: id.parse,
   });
 

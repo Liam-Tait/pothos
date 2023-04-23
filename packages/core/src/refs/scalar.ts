@@ -7,9 +7,9 @@ import {
   PothosScalarTypeConfig,
   SchemaTypes,
 } from '../types';
-import BaseTypeRef from './base';
+import { BaseTypeRef } from './base';
 
-export default class ScalarRef<Types extends SchemaTypes, T, U, P = T>
+export class ScalarRef<Types extends SchemaTypes, T, U, P = T>
   extends BaseTypeRef<Types, PothosScalarTypeConfig>
   implements OutputRef, InputRef, PothosSchemaTypes.ScalarRef<Types, T, U, P>
 {
@@ -20,7 +20,7 @@ export default class ScalarRef<Types extends SchemaTypes, T, U, P = T>
 
   [inputShapeKey]!: U;
 
-  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string) {
-    super(builder, 'Scalar', name);
+  constructor(name: string) {
+    super('Scalar', name);
   }
 }

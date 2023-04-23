@@ -63,7 +63,7 @@ export default class InputFieldBuilder<Types extends SchemaTypes, Kind extends k
     }
     listRef = <T extends InputTypeParam<Types>, Required extends boolean = true>(type: T, options?: {
         required?: Required;
-    }): InputListRef<Types, InputShapeFromTypeParam<Types, T, Required>[]> => new InputListRef<Types, InputShapeFromTypeParam<Types, T, Required>[]>(type, options?.required ?? true);
+    }): InputListRef<Types, InputShapeFromTypeParam<Types, T, Required>[]> => new InputListRef<Types, InputShapeFromTypeParam<Types, T, Required>[]>(this.builder, type, options?.required ?? true);
     argBuilder(): ArgBuilder<Types> {
         const builder = this.field.bind(this as never) as InputFieldBuilder<Types, "Arg">["field"];
         const protoKeys = Object.keys(Object.getPrototypeOf(this) as object).filter((key) => typeof (this as Record<string, unknown>)[key] === "function" &&

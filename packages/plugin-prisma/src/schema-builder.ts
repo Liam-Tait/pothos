@@ -28,7 +28,7 @@ schemaBuilderProto.prismaObject = function prismaObject(
   { fields, findUnique, select, include, description, ...options },
 ) {
   const ref = options.variant
-    ? new PrismaObjectRef(this, options.variant, type)
+    ? new PrismaObjectRef(options.variant, type)
     : getRefFromModel(type, this);
   const name = options.variant ?? options.name ?? type;
   const fieldMap = getRelationMap(getDMMF(this)).get(type)!;
@@ -83,7 +83,7 @@ schemaBuilderProto.prismaNode = function prismaNode(
   const resolve = rawResolve ?? getDefaultIDSerializer(type, fieldName, this);
   const idParser = fieldName ? getDefaultIDParser(type, fieldName, this) : undefined;
   const typeName = variant ?? name ?? type;
-  const nodeRef = new PrismaNodeRef(this, typeName, type);
+  const nodeRef = new PrismaNodeRef(typeName, type);
   const findUnique = rawFindUnique
     ? (parent: unknown, context: {}) =>
         rawFindUnique(resolve(parent as never, context) as string, context)

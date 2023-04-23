@@ -20,7 +20,7 @@ declare global {
             addGraphQLInterface: <Shape>(type: GraphQLInterfaceType, options: AddGraphQLInterfaceTypeOptions<Types, Shape>) => InterfaceRef<Types, Shape>;
             addGraphQLUnion: <Shape>(type: GraphQLUnionType, options: AddGraphQLUnionTypeOptions<Types, ObjectRef<Types, Shape>>) => UnionRef<Types, Shape>;
             addGraphQLEnum: <Shape extends string | number>(type: GraphQLEnumType, options: AddGraphQLEnumTypeOptions<Types, EnumValuesWithShape<Types, Shape>>) => EnumRef<Types, Shape>;
-            addGraphQLInput: <Shape extends {}>(type: GraphQLInputObjectType, options: AddGraphQLInputTypeOptions<Types, Shape>) => InputTypeRef<Types, Shape>;
+            addGraphQLInput: <Shape extends {}>(type: GraphQLInputObjectType, options: AddGraphQLInputTypeOptions<Types, Shape>) => InputObjectRef<Types, Shape>;
         }
     }
 }

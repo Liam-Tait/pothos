@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable @typescript-eslint/no-throw-literal */
 /* eslint-disable no-await-in-loop */
 import { RegisterOptions } from '../types.ts';
 type Timer = ReturnType<typeof setTimeout>;
@@ -70,7 +71,8 @@ export default class SubscriptionManager implements AsyncIterator<object> {
             value: this.value,
         };
     }
-    async throw(error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
+    throw(error: unknown) {
         this.handleError(error);
         return Promise.reject<IteratorResult<object>>(error);
     }
@@ -170,7 +172,7 @@ export default class SubscriptionManager implements AsyncIterator<object> {
         const promises: Promise<void>[] = [];
         for (const options of optionsList) {
             const currentAllowed = !options.filter || options.filter(value);
-            allowed = allowed || currentAllowed;
+            allowed ||= currentAllowed;
             if (currentAllowed && options.onValue) {
                 const promise = options.onValue(value);
                 if (promise) {

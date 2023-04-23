@@ -7,6 +7,7 @@ export const refMap = new WeakMap<
   object,
   Map<string, PrismaObjectRef<SchemaTypes, PrismaModelTypes>>
 >();
+
 export const findUniqueMap = new WeakMap<
   object,
   Map<ObjectRef<SchemaTypes, unknown>, ((args: unknown, ctx: {}) => unknown) | null>
@@ -27,10 +28,10 @@ export function getRefFromModel<Types extends SchemaTypes>(
   const cache = refMap.get(builder)!;
 
   if (!cache.has(name)) {
-    cache.set(name, new PrismaObjectRef(builder, name, name));
+    cache.set(name, new PrismaObjectRef(name, name) as never);
   }
 
-  return cache.get(name)!;
+  return cache.get(name)! as never;
 }
 
 export function getRelation<Types extends SchemaTypes>(

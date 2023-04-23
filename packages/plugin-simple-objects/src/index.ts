@@ -33,7 +33,7 @@ proto.simpleObject = function simpleObject<
   name: string,
   options: PothosSchemaTypes.SimpleObjectTypeOptions<SchemaTypes, Interfaces, Fields, Shape>,
 ) {
-  const ref = new ObjectRef<SchemaTypes, Shape>(this, name);
+  const ref = new ObjectRef<SchemaTypes, Shape>(name);
 
   if (options.fields) {
     const originalFields = options.fields;
@@ -68,7 +68,7 @@ proto.simpleInterface = function simpleInterface<
   name: string,
   options: PothosSchemaTypes.SimpleInterfaceTypeOptions<SchemaTypes, Fields, Shape, Interfaces>,
 ) {
-  const ref = new InterfaceRef<SchemaTypes, Shape>(this, name);
+  const ref = new InterfaceRef<SchemaTypes, Shape>(name);
 
   if (options.fields) {
     const originalFields = options.fields;

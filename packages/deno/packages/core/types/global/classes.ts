@@ -34,7 +34,7 @@ declare global {
         }
         export interface InputFieldBuilder<Types extends SchemaTypes, Kind extends "Arg" | "InputObject"> extends InternalInputFieldBuilder<Types, Kind> {
         }
-        export interface BaseTypeRef<Types extends SchemaTypes> extends InternalBaseRef<Types> {
+        export interface BaseTypeRef<Types extends SchemaTypes, T> extends InternalBaseRef<Types, T> {
         }
         export interface EnumRef<Types extends SchemaTypes, T, U = T> extends InternalEnumRef<Types, T, U> {
         }

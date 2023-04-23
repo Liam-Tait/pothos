@@ -1,8 +1,39 @@
 // @ts-nocheck
+/* eslint-disable max-classes-per-file */
 import { GraphQLResolveInfo } from 'https://cdn.skypack.dev/graphql?dts';
 import { completeValue, FieldRef, InterfaceRef, PothosObjectTypeConfig, SchemaTypes, } from '../../core/index.ts';
 import { DataLoaderOptions, LoadableNodeId } from '../types.ts';
-import { ImplementableLoadableObjectRef } from './object.ts';
+import { dataloaderGetter } from '../util.ts';
+import { ImplementableLoadableObjectRef, LoadableObjectRef } from './object.ts';
+export class LoadableNodeRef<Types extends SchemaTypes, RefShape, Shape extends object, IDShape extends bigint | number | string = string, Key extends bigint | number | string = IDShape, CacheKey = Key> extends LoadableObjectRef<Types, RefShape, Shape, Key, CacheKey> {
+    parseId: ((id: string, ctx: object) => IDShape) | undefined;
+    constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string, { id, loaderOptions, load, toKey, sort, ...options }: DataLoaderOptions<Types, Shape, Key, CacheKey> & LoadableNodeId<Types, Shape, IDShape>) {
+        super(builder, name, dataloaderGetter<Key, Shape, CacheKey>(loaderOptions, load, toKey, sort));
+        this.parseId = id.parse;
+        this.builder.objectField(this, (this.builder.options as {
+            relayOptions?: {
+                idFieldName?: string;
+            };
+        }).relayOptions
+            ?.idFieldName ?? "id", (t) => (t as unknown as {
+            globalID: (options: Record<string, unknown>) => FieldRef<Types, unknown>;
+        }).globalID({
+            ...(this.builder.options as {
+                relayOptions?: {
+                    idFieldOptions?: {};
+                };
+            }).relayOptions
+                ?.idFieldOptions,
+            ...id,
+            nullable: false,
+            args: {},
+            resolve: (parent: Shape, args: object, context: object, info: GraphQLResolveInfo) => completeValue(id.resolve(parent, args, context, info), (globalId) => ({
+                type: name,
+                id: globalId,
+            })),
+        }));
+    }
+}
 export class ImplementableLoadableNodeRef<Types extends SchemaTypes, RefShape, Shape extends object, IDShape extends bigint | number | string = string, Key extends bigint | number | string = IDShape, CacheKey = Key> extends ImplementableLoadableObjectRef<Types, RefShape, Shape, Key, CacheKey> {
     parseId: ((id: string, ctx: object) => IDShape) | undefined;
     private idOptions;
@@ -13,7 +44,7 @@ export class ImplementableLoadableNodeRef<Types extends SchemaTypes, RefShape, S
         this.builder.configStore.onTypeConfig(this, (config) => {
             const nodeInterface = (this.builder as PothosSchemaTypes.SchemaBuilder<Types> & {
                 nodeInterfaceRef: () => InterfaceRef<Types, unknown>;
-            }).nodeInterfaceRef();
+            }).nodeInterfaceRef() as unknown as InterfaceRef<SchemaTypes, unknown>;
             // eslint-disable-next-line no-param-reassign
             (config.pothosOptions as {
                 loadManyWithoutCache: unknown;

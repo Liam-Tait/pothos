@@ -6,8 +6,8 @@ import { DataLoaderOptions } from '../types.ts';
 import { dataloaderGetter } from '../util.ts';
 export class LoadableObjectRef<Types extends SchemaTypes, RefShape, Shape, Key, CacheKey> extends ObjectRef<Types, RefShape, Shape> {
     getDataloader;
-    constructor(name: string, getDataloader: (context: Types["Context"]) => DataLoader<Key, Shape, CacheKey>) {
-        super(name);
+    constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string, getDataloader: (context: Types["Context"]) => DataLoader<Key, Shape, CacheKey>) {
+        super(builder, name);
         this.getDataloader = getDataloader;
     }
 }

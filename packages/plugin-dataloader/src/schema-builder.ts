@@ -1,13 +1,14 @@
 import type { GraphQLResolveInfo } from 'graphql';
 import SchemaBuilder, {
   InterfaceParam,
+  InterfaceRef,
   ObjectParam,
   OutputRef,
   PothosSchemaError,
   SchemaTypes,
   ShapeFromTypeParam,
 } from '@pothos/core';
-import { ImplementableLoadableNodeRef } from './refs';
+import { ImplementableLoadableNodeRef, LoadableNodeRef } from './refs';
 import { ImplementableLoadableInterfaceRef } from './refs/interface';
 import { ImplementableLoadableObjectRef } from './refs/object';
 import { LoadableUnionRef } from './refs/union';
@@ -111,11 +112,7 @@ schemaBuilderProto.loadableUnion = function loadableUnion<
 ) {
   const getDataloader = dataloaderGetter<Key, Shape, CacheKey>(loaderOptions, load, toKey, sort);
 
-  const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(
-    this,
-    name,
-    getDataloader,
-  );
+  const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(name, getDataloader);
 
   this.unionType(name, {
     ...options,
@@ -160,14 +157,20 @@ schemaBuilderProto.loadableNode = function loadableNode<
       ? nameOrRef
       : (options as { name?: string }).name ?? (nameOrRef as { name: string }).name;
 
-  const ref = new ImplementableLoadableNodeRef<SchemaTypes, Shape, Shape, IDShape, Key, CacheKey>(
-    this,
-    name,
-    options,
-  );
+  const ref = new LoadableNodeRef<SchemaTypes, Shape, Shape, IDShape, Key, CacheKey>(name, options);
 
-  ref.implement({
+  this.objectType(ref, {
     ...options,
+    interfaces: () => [
+      ...(((typeof options.interfaces === 'function'
+        ? options.interfaces()
+        : options.interfaces) as Interfaces) ?? []),
+      (
+        this as PothosSchemaTypes.SchemaBuilder<SchemaTypes> & {
+          nodeInterfaceRef: () => InterfaceRef<SchemaTypes, unknown>;
+        }
+      ).nodeInterfaceRef(),
+    ],
     extensions: {
       ...options.extensions,
       pothosParseGlobalID: options.id.parse,

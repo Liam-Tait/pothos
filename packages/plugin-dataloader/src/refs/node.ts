@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { GraphQLResolveInfo } from 'graphql';
 import {
   completeValue,
@@ -7,7 +8,60 @@ import {
   SchemaTypes,
 } from '@pothos/core';
 import { DataLoaderOptions, LoadableNodeId } from '../types';
-import { ImplementableLoadableObjectRef } from './object';
+import { dataloaderGetter } from '../util';
+import { ImplementableLoadableObjectRef, LoadableObjectRef } from './object';
+
+export class LoadableNodeRef<
+  Types extends SchemaTypes,
+  RefShape,
+  Shape extends object,
+  IDShape extends bigint | number | string = string,
+  Key extends bigint | number | string = IDShape,
+  CacheKey = Key,
+> extends LoadableObjectRef<Types, RefShape, Shape, Key, CacheKey> {
+  parseId: ((id: string, ctx: object) => IDShape) | undefined;
+
+  constructor(
+    name: string,
+    {
+      id,
+      loaderOptions,
+      load,
+      toKey,
+      sort,
+      ...options
+    }: DataLoaderOptions<Types, Shape, Key, CacheKey> & LoadableNodeId<Types, Shape, IDShape>,
+  ) {
+    super(name, dataloaderGetter<Key, Shape, CacheKey>(loaderOptions, load, toKey, sort));
+
+    this.parseId = id.parse;
+
+    this.onConfig((config, builder) => {
+      builder.objectField(
+        this,
+        (builder.options as { relayOptions?: { idFieldName?: string } }).relayOptions
+          ?.idFieldName ?? 'id',
+        (t) =>
+          (
+            t as unknown as {
+              globalID: (options: Record<string, unknown>) => FieldRef<Types, unknown>;
+            }
+          ).globalID({
+            ...(builder.options as { relayOptions?: { idFieldOptions?: {} } }).relayOptions
+              ?.idFieldOptions,
+            ...id,
+            nullable: false,
+            args: {},
+            resolve: (parent: Shape, args: object, context: object, info: GraphQLResolveInfo) =>
+              completeValue(id.resolve(parent, args, context, info), (globalId) => ({
+                type: name,
+                id: globalId,
+              })),
+          }),
+      );
+    });
+  }
+}
 
 export class ImplementableLoadableNodeRef<
   Types extends SchemaTypes,
@@ -35,9 +89,9 @@ export class ImplementableLoadableNodeRef<
     this.builder.configStore.onTypeConfig(this, (config) => {
       const nodeInterface = (
         this.builder as PothosSchemaTypes.SchemaBuilder<Types> & {
-          nodeInterfaceRef: () => InterfaceRef<SchemaTypes, unknown>;
+          nodeInterfaceRef: () => InterfaceRef<Types, unknown>;
         }
-      ).nodeInterfaceRef();
+      ).nodeInterfaceRef() as unknown as InterfaceRef<SchemaTypes, unknown>;
 
       // eslint-disable-next-line no-param-reassign
       (config.pothosOptions as { loadManyWithoutCache: unknown }).loadManyWithoutCache = (

@@ -14,11 +14,10 @@ export class LoadableObjectRef<
   getDataloader;
 
   constructor(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>,
     name: string,
     getDataloader: (context: Types['Context']) => DataLoader<Key, Shape, CacheKey>,
   ) {
-    super(builder, name);
+    super(name);
 
     this.getDataloader = getDataloader;
   }

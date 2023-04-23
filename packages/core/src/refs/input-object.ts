@@ -7,9 +7,9 @@ import {
   RecursivelyNormalizeNullableFields,
   SchemaTypes,
 } from '../types';
-import BaseTypeRef from './base';
+import { BaseTypeRef } from './base';
 
-export default class InputObjectRef<Types extends SchemaTypes, T>
+export class InputObjectRef<Types extends SchemaTypes, T>
   extends BaseTypeRef<Types, PothosInputObjectTypeConfig>
   implements InputRef<T>, PothosSchemaTypes.InputObjectRef<Types, T>
 {
@@ -17,12 +17,8 @@ export default class InputObjectRef<Types extends SchemaTypes, T>
 
   [inputShapeKey]!: T;
 
-  constructor(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>,
-    name: string,
-    config?: PothosInputObjectTypeConfig,
-  ) {
-    super(builder, 'InputObject', name, config);
+  constructor(name: string) {
+    super('InputObject', name);
   }
 }
 
@@ -30,6 +26,13 @@ export class ImplementableInputObjectRef<
   Types extends SchemaTypes,
   T extends object,
 > extends InputObjectRef<Types, RecursivelyNormalizeNullableFields<T>> {
+  builder: PothosSchemaTypes.SchemaBuilder<Types>;
+
+  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>, name: string) {
+    super(name);
+    this.builder = builder;
+  }
+
   implement(
     options: PothosSchemaTypes.InputObjectTypeOptions<
       Types,

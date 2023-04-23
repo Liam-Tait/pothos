@@ -1,7 +1,7 @@
-import type ArgumentRef from '../refs/arg';
-import type InputFieldRef from '../refs/input-field';
-import type InterfaceRef from '../refs/interface';
-import type ObjectRef from '../refs/object';
+import type { ArgumentRef } from '../refs/arg';
+import type { InputFieldRef } from '../refs/input-field';
+import type { InterfaceRef } from '../refs/interface';
+import type { ObjectRef } from '../refs/object';
 import type { RootName, SchemaTypes } from './schema-types';
 
 export const outputShapeKey = Symbol.for('Pothos.outputShapeKey');

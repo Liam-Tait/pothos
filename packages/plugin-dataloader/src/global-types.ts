@@ -11,7 +11,7 @@ import {
   ShapeFromTypeParam,
   TypeParam,
 } from '@pothos/core';
-import { ImplementableLoadableNodeRef } from './refs';
+import { ImplementableLoadableNodeRef, LoadableNodeRef } from './refs';
 import { ImplementableLoadableInterfaceRef, LoadableInterfaceRef } from './refs/interface';
 import { ImplementableLoadableObjectRef, LoadableObjectRef } from './refs/object';
 import { LoadableUnionRef } from './refs/union';
@@ -123,10 +123,7 @@ declare global {
               Key,
               CacheKey
             >,
-          ) => Omit<
-            ImplementableLoadableNodeRef<Types, Key | Shape, Shape, IDShape, Key, CacheKey>,
-            'implement'
-          >
+          ) => LoadableNodeRef<Types, Key | Shape, Shape, IDShape, Key, CacheKey>
         : '@pothos/plugin-relay is required to use this method';
     }
 

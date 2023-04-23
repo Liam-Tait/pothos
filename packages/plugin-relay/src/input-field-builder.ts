@@ -1,16 +1,5 @@
-import {
-  FieldRequiredness,
-  InputFieldBuilder,
-  InputFieldRef,
-  InputShapeFromTypeParam,
-  ObjectRef,
-  SchemaTypes,
-} from '@pothos/core';
-import {
-  GlobalIDInputFieldOptions,
-  GlobalIDInputShape,
-  GlobalIDListInputFieldOptions,
-} from './types';
+import { FieldRequiredness, InputFieldBuilder, ObjectRef, SchemaTypes } from '@pothos/core';
+import { GlobalIDInputFieldOptions, GlobalIDListInputFieldOptions } from './types';
 
 type DefaultSchemaTypes = PothosSchemaTypes.ExtendDefaultTypes<{}>;
 
@@ -25,8 +14,10 @@ inputFieldBuilder.globalIDList = function globalIDList<Req extends FieldRequired
     ...options
   }: GlobalIDListInputFieldOptions<DefaultSchemaTypes, Req, 'Arg' | 'InputObject'> = {} as never,
 ) {
-  return this.idList({
-    ...options,
+  const idRef = this.idList(options);
+
+  idRef.onConfig((config, builder) => ({
+    ...config,
     extensions: {
       ...options.extensions,
       isRelayGlobalID: true,
@@ -37,11 +28,13 @@ inputFieldBuilder.globalIDList = function globalIDList<Req extends FieldRequired
             unknown
           >[]
         )?.map((type: ObjectRef<SchemaTypes, unknown>) => ({
-          typename: this.builder.configStore.getTypeConfig(type).name,
+          typename: builder.configStore.getTypeConfig(type).name,
           parseId: 'parseId' in type ? type.parseId : undefined,
         })) ?? null,
     },
-  }) as never;
+  }));
+
+  return idRef as never;
 };
 
 inputFieldBuilder.globalID = function globalID<Req extends boolean>(
@@ -50,10 +43,12 @@ inputFieldBuilder.globalID = function globalID<Req extends boolean>(
     ...options
   }: GlobalIDInputFieldOptions<DefaultSchemaTypes, Req, 'Arg' | 'InputObject'> = {} as never,
 ) {
-  return this.id({
-    ...options,
+  const idRef = this.id(options);
+
+  idRef.onConfig((config, builder) => ({
+    ...config,
     extensions: {
-      ...options.extensions,
+      ...config.extensions,
       isRelayGlobalID: true,
       relayGlobalIDFor:
         (
@@ -62,29 +57,36 @@ inputFieldBuilder.globalID = function globalID<Req extends boolean>(
             unknown
           >[]
         )?.map((type: ObjectRef<SchemaTypes, unknown>) => ({
-          typename: this.builder.configStore.getTypeConfig(type).name,
+          typename: builder.configStore.getTypeConfig(type).name,
           parseId: 'parseId' in type ? type.parseId : undefined,
         })) ?? null,
     },
-  }) as unknown as InputFieldRef<
-    SchemaTypes,
-    InputShapeFromTypeParam<DefaultSchemaTypes, GlobalIDInputShape, Req>
-  > as never;
+  }));
+
+  return idRef as never;
 };
 
 inputFieldBuilder.connectionArgs = function connectionArgs() {
-  const {
-    cursorType = 'String',
-    beforeArgOptions = {} as never,
-    afterArgOptions = {} as never,
-    firstArgOptions = {} as never,
-    lastArgOptions = {} as never,
-  } = this.builder.options.relay ?? {};
-
   return {
-    before: this.field({ ...beforeArgOptions, type: cursorType, required: false }),
-    after: this.field({ ...afterArgOptions, type: cursorType, required: false }),
-    first: this.int({ ...firstArgOptions, required: false }),
-    last: this.int({ ...lastArgOptions, required: false }),
+    before: this.field((builder) => ({
+      ...builder.options.relay?.beforeArgOptions,
+      type: builder.options.relay?.cursorType ?? 'String',
+      required: false,
+    })),
+    after: this.field((builder) => ({
+      ...builder.options.relay?.afterArgOptions,
+      type: builder.options.relay?.cursorType ?? 'String',
+      required: false,
+    })),
+    first: this.field((builder) => ({
+      ...builder.options.relay?.firstArgOptions,
+      type: 'Int',
+      required: false,
+    })),
+    last: this.field((builder) => ({
+      ...builder.options.relay?.lastArgOptions,
+      type: 'Int',
+      required: false,
+    })),
   };
 };

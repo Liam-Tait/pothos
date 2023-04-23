@@ -29,7 +29,7 @@ export async function resolveNodes<Types extends SchemaTypes>(builder: PothosSch
         const config = builder.configStore.getTypeConfig(typename, "Object");
         const options = config.pothosOptions as NodeObjectOptions<Types, ObjectParam<Types>, [
         ]>;
-        const shouldBrandObjects = options.brandLoadedObjects ?? builder.options.relay?.brandLoadedObjects ?? false;
+        const shouldBrandObjects = options.brandLoadedObjects ?? builder.options.relay?.brandLoadedObjects ?? true;
         const resultsForType = await resolveUncachedNodesForType(builder, context, info, ids, typename);
         resultsForType.forEach((val, i) => {
             if (shouldBrandObjects) {

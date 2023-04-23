@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { GraphQLResolveInfo } from 'https://cdn.skypack.dev/graphql?dts';
-import SchemaBuilder, { InterfaceParam, ObjectParam, OutputRef, PothosSchemaError, SchemaTypes, ShapeFromTypeParam, } from '../core/index.ts';
-import { ImplementableLoadableNodeRef } from './refs/index.ts';
+import SchemaBuilder, { InterfaceParam, InterfaceRef, ObjectParam, OutputRef, PothosSchemaError, SchemaTypes, ShapeFromTypeParam, } from '../core/index.ts';
+import { ImplementableLoadableNodeRef, LoadableNodeRef } from './refs/index.ts';
 import { ImplementableLoadableInterfaceRef } from './refs/interface.ts';
 import { ImplementableLoadableObjectRef } from './refs/object.ts';
 import { LoadableUnionRef } from './refs/union.ts';
@@ -50,7 +50,7 @@ schemaBuilderProto.loadableInterface = function loadableInterface<Shape extends 
 };
 schemaBuilderProto.loadableUnion = function loadableUnion<Key extends DataloaderKey, Member extends ObjectParam<SchemaTypes>, CacheKey = Key, Shape = ShapeFromTypeParam<SchemaTypes, Member, false>>(name: string, { load, toKey, sort, cacheResolved, loaderOptions, ...options }: LoadableUnionOptions<SchemaTypes, Key, Member, CacheKey, Shape>) {
     const getDataloader = dataloaderGetter<Key, Shape, CacheKey>(loaderOptions, load, toKey, sort);
-    const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(name, getDataloader);
+    const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(this, name, getDataloader);
     this.unionType(name, {
         ...options,
         extensions: {
@@ -74,9 +74,17 @@ schemaBuilderProto.loadableNode = function loadableNode<Shape extends NameOrRef 
         }).name ?? (nameOrRef as {
             name: string;
         }).name;
-    const ref = new ImplementableLoadableNodeRef<SchemaTypes, Shape, Shape, IDShape, Key, CacheKey>(this, name, options);
-    ref.implement({
+    const ref = new LoadableNodeRef<SchemaTypes, Shape, Shape, IDShape, Key, CacheKey>(this, name, options);
+    this.objectType(ref, {
         ...options,
+        interfaces: () => [
+            ...(((typeof options.interfaces === "function"
+                ? options.interfaces()
+                : options.interfaces) as Interfaces) ?? []),
+            (this as PothosSchemaTypes.SchemaBuilder<SchemaTypes> & {
+                nodeInterfaceRef: () => InterfaceRef<SchemaTypes, unknown>;
+            }).nodeInterfaceRef(),
+        ],
         extensions: {
             ...options.extensions,
             pothosParseGlobalID: options.id.parse,

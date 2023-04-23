@@ -10,7 +10,7 @@ declare global {
         }
         export interface SchemaBuilder<Types extends SchemaTypes> {
             simpleObject: <Interfaces extends InterfaceParam<Types>[], Fields extends FieldMap, Shape extends Normalize<OutputShapeFromFields<Fields> & ParentShape<Types, Interfaces[number]>>>(name: string, options: SimpleObjectTypeOptions<Types, Interfaces, Fields, Shape>) => ObjectRef<Types, Shape>;
-            simpleInterface: <Fields extends FieldMap, Shape extends OutputShapeFromFields<Fields>, Interfaces extends InterfaceParam<SchemaTypes>[]>(name: string, options: SimpleInterfaceTypeOptions<Types, Fields, Shape, Interfaces>) => InterfaceRef<Types, Shape>;
+            simpleInterface: <Fields extends FieldMap, Shape extends OutputShapeFromFields<Fields>, Interfaces extends InterfaceParam<Types>[]>(name: string, options: SimpleInterfaceTypeOptions<Types, Fields, Shape, Interfaces>) => InterfaceRef<Types, Shape>;
         }
         export interface PothosKindToGraphQLType {
             SimpleObject: "Object";
@@ -23,7 +23,7 @@ declare global {
         export type SimpleObjectTypeOptions<Types extends SchemaTypes, Interfaces extends InterfaceParam<Types>[], Fields extends FieldMap, Shape> = Omit<ObjectTypeOptions<Types, Shape> | ObjectTypeWithInterfaceOptions<Types, Shape, Interfaces>, "fields"> & {
             fields?: SimpleObjectFieldsShape<Types, Fields>;
         };
-        export interface SimpleInterfaceTypeOptions<Types extends SchemaTypes, Fields extends FieldMap, Shape extends OutputShapeFromFields<Fields>, Interfaces extends InterfaceParam<SchemaTypes>[]> extends Omit<InterfaceTypeOptions<Types, Shape, Interfaces>, "args" | "fields"> {
+        export interface SimpleInterfaceTypeOptions<Types extends SchemaTypes, Fields extends FieldMap, Shape extends OutputShapeFromFields<Fields>, Interfaces extends InterfaceParam<Types>[]> extends Omit<InterfaceTypeOptions<Types, Shape, Interfaces>, "args" | "fields"> {
             fields?: SimpleObjectFieldsShape<Types, Fields>;
         }
     }

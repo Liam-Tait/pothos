@@ -26,7 +26,9 @@ export default class ConfigStore<Types extends SchemaTypes> {
     private pendingRefResolutions = new Map<ConfigurableRef<Types>, ((config: PothosTypeConfig) => void)[]>();
     private fieldRefCallbacks = new Map<GenericInputFieldRef | GenericFieldRef, ((config: PothosFieldConfig<Types>) => void)[]>();
     private pending = true;
-    constructor() {
+    private builder: PothosSchemaTypes.SchemaBuilder<Types>;
+    constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
+        this.builder = builder;
         const scalars: GraphQLScalarType[] = [
             GraphQLID,
             GraphQLInt,
@@ -35,7 +37,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
             GraphQLBoolean,
         ];
         scalars.forEach((scalar) => {
-            const ref = new BuiltinScalarRef(scalar);
+            const ref = new BuiltinScalarRef(builder, scalar);
             this.scalarsToRefs.set(scalar.name, ref);
             this.refsToName.set(ref, scalar.name);
         });
@@ -212,7 +214,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
                     config.graphqlKind !== "Scalar") {
                     throw new PothosSchemaError(`Expected ${config.name} to be an input type but got ${config.graphqlKind}`);
                 }
-                const newRef = new InputTypeRef(config.graphqlKind, config.name);
+                const newRef = new InputTypeRef(this.builder, config.graphqlKind, config.name);
                 this.refsToName.set(newRef, config.name);
                 return newRef;
             }
@@ -238,7 +240,7 @@ export default class ConfigStore<Types extends SchemaTypes> {
                 if (config.graphqlKind === "InputObject") {
                     throw new PothosSchemaError(`Expected ${config.name} to be an output type but got ${config.graphqlKind}`);
                 }
-                const newRef = new OutputTypeRef(config.graphqlKind, config.name);
+                const newRef = new OutputTypeRef(this.builder, config.graphqlKind, config.name);
                 this.refsToName.set(newRef, config.name);
                 return newRef;
             }

@@ -1,17 +1,19 @@
-import { inputShapeKey, SchemaTypes } from '../types';
-import BaseTypeRef from './base';
+import { InputFieldMap, inputShapeKey, SchemaTypes } from '../types';
+import { BaseTypeRef } from './base';
 
-export default class InputTypeRef<Types extends SchemaTypes, T> extends BaseTypeRef<Types> {
+export class InputTypeRef<Types extends SchemaTypes, T> extends BaseTypeRef<Types> {
   override kind;
 
   [inputShapeKey]!: T;
 
-  constructor(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>,
-    kind: 'Enum' | 'InputObject' | 'Scalar',
-    name: string,
-  ) {
-    super(builder, kind, name);
+  private fields = new Set<() => InputFieldMap>();
+
+  constructor(kind: 'Enum' | 'InputObject' | 'Scalar', name: string) {
+    super(kind, name);
     this.kind = kind;
+  }
+
+  addFields(fields: () => InputFieldMap) {
+    this.fields.add(fields);
   }
 }
