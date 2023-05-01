@@ -639,13 +639,7 @@ input MediaWithoutUploadedByFilter {
 }
 
 type Mutation {
-  createPost(data: PostCreate!): Post!
-  createUser(data: UserCreate!): User!
   deleteManyPosts(where: PostFilter!): Boolean!
-  deletePost(where: PostUniqueFilter!): Post!
-  deleteUser(where: UserUniqueFilter!): User!
-  updatePost(data: PostUpdate!, where: PostUniqueFilter!): Post!
-  updateUser(data: UserUpdate!, where: UserUniqueFilter!): User!
 }
 
 enum OrderBy {
@@ -1074,10 +1068,7 @@ input ProfileUpdateWithoutUser {
   id: Int
 }
 
-type Query {
-  user(where: UserUniqueFilter!): User
-  users(filter: UserFilter! = {}, orderBy: UserOrderBy! = {id: Asc}): [User!]!
-}
+type Query
 
 input StringFilter {
   contains: String

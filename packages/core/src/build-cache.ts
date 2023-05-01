@@ -24,7 +24,7 @@ import {
   GraphQLUnionType,
 } from 'graphql';
 import type { SchemaBuilder } from './builder';
-import { ConfigStore } from './config-store';
+import type { ConfigStore } from './config-store';
 import { PothosError, PothosSchemaError } from './errors';
 import { BasePlugin, MergedPlugins } from './plugins';
 import { BuiltinScalarRef } from './refs/builtin-scalar';

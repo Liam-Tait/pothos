@@ -1,5 +1,4 @@
 import './global-types';
-import { defaultFieldResolver } from 'graphql';
 import SchemaBuilder, {
   BasePlugin,
   FieldMap,
@@ -35,26 +34,6 @@ proto.simpleObject = function simpleObject<
 ) {
   const ref = new ObjectRef<SchemaTypes, Shape>(name);
 
-  if (options.fields) {
-    const originalFields = options.fields;
-
-    // eslint-disable-next-line no-param-reassign
-    options.fields = (t) => {
-      const fields = originalFields(t);
-
-      Object.keys(fields).forEach((key) => {
-        this.configStore.onFieldUse(fields[key], (config) => {
-          if (config.kind === 'Object') {
-            // eslint-disable-next-line no-param-reassign
-            config.resolve = defaultFieldResolver;
-          }
-        });
-      });
-
-      return fields;
-    };
-  }
-
   this.objectType(ref, options as PothosSchemaTypes.ObjectTypeOptions);
 
   return ref;
@@ -69,26 +48,6 @@ proto.simpleInterface = function simpleInterface<
   options: PothosSchemaTypes.SimpleInterfaceTypeOptions<SchemaTypes, Fields, Shape, Interfaces>,
 ) {
   const ref = new InterfaceRef<SchemaTypes, Shape>(name);
-
-  if (options.fields) {
-    const originalFields = options.fields;
-
-    // eslint-disable-next-line no-param-reassign
-    options.fields = (t) => {
-      const fields = originalFields(t);
-
-      Object.keys(fields).forEach((key) => {
-        this.configStore.onFieldUse(fields[key], (config) => {
-          if (config.kind === 'Interface') {
-            // eslint-disable-next-line no-param-reassign
-            config.resolve = defaultFieldResolver;
-          }
-        });
-      });
-
-      return fields;
-    };
-  }
 
   this.interfaceType(ref, options as {});
 

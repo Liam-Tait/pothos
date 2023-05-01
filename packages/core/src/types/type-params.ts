@@ -1,4 +1,5 @@
 import type { ArgumentRef } from '../refs/arg';
+import { BaseTypeRef } from '../refs/base';
 import type { InputFieldRef } from '../refs/input-field';
 import type { InterfaceRef } from '../refs/interface';
 import type { ObjectRef } from '../refs/object';
@@ -101,6 +102,7 @@ export type InputType<Types extends SchemaTypes> =
 export type ConfigurableRef<Types extends SchemaTypes> =
   | InputType<Types>
   | OutputType<Types>
+  | BaseTypeRef<Types, unknown>
   | RootName;
 
 export type TypeParam<Types extends SchemaTypes> = OutputType<Types> | [OutputType<Types>];

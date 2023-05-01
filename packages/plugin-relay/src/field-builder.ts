@@ -221,7 +221,7 @@ fieldBuilderProto.connection = function connection(
             },
       );
 
-      builder.configStore.associateRefWithName(connectionRef, connectionName);
+      // builder.configStore.associateRefWithName(connectionRef, connectionName);
     });
   }
 

@@ -26,34 +26,35 @@ rootBuilderProto.fieldWithInput = function fieldWithInput({
   input,
   ...fieldOptions
 }) {
-  const inputRef = this.builder.inputRef(typeName ?? `UnnamedWithInput`);
-  const { name: getTypeName = defaultGetName, ...defaultTypeOptions } =
-    this.builder.options.withInput?.typeOptions ?? {};
+  const fieldRef = this.field(
+    (builder) =>
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      ({
+        args: {
+          ...args,
+          [argName]: this.arg({
+            required: true,
+            ...builder.options.withInput?.argOptions,
+            ...(argOptions as {}),
+            type: builder.inputRef(typeName ?? `UnnamedWithInput`),
+          }),
+        },
+        ...fieldOptions,
+      } as never),
+  );
 
-  const fieldRef = this.field({
-    args: {
-      ...args,
-      [argName]: this.arg({
-        required: true,
-        ...this.builder.options.withInput?.argOptions,
-        ...(argOptions as {}),
-        type: inputRef,
-      }),
-    },
-    ...fieldOptions,
-  } as never);
+  fieldRef.onConfig((config, builder) => {
+    const { name: getTypeName = defaultGetName, ...defaultTypeOptions } =
+      builder.options.withInput?.typeOptions ?? {};
 
-  this.builder.configStore.onFieldUse(fieldRef, (config) => {
     const name =
       typeName ?? getTypeName({ parentTypeName: config.parentType, fieldName: config.name });
 
-    this.builder.inputType(name, {
+    builder.inputType(name, {
       fields: () => input,
       ...defaultTypeOptions,
       ...typeOptions,
     } as never);
-
-    this.builder.configStore.associateRefWithName(inputRef, name);
   });
 
   return fieldRef;
@@ -61,6 +62,6 @@ rootBuilderProto.fieldWithInput = function fieldWithInput({
 
 Object.defineProperty(rootBuilderProto, 'input', {
   get: function getInputBuilder(this: RootFieldBuilder<SchemaTypes, unknown>) {
-    return new InputFieldBuilder(this.builder, 'InputObject', `UnnamedWithInput`);
+    return new InputFieldBuilder('InputObject', `UnnamedWithInput`);
   },
 });

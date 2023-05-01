@@ -86,7 +86,7 @@ export class ExternalEntityRef<
     const ref = Object.create(this) as ExternalEntityRef<Types, Shape & T, Key>;
 
     providesMap.set(ref, selection);
-    this.builder.configStore.associateRefWithName(ref, this.name);
+    this.builder.configStore.associateParamWithRef(ref, this);
 
     return ref;
   }

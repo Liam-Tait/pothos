@@ -56,7 +56,7 @@ schemaBuilderProto.loadableObject = function loadableObject<
   ref.implement(options);
 
   if (typeof nameOrRef !== 'string') {
-    this.configStore.associateRefWithName(nameOrRef, name);
+    this.configStore.associateParamWithRef(nameOrRef, ref);
   }
 
   return ref;
@@ -88,7 +88,7 @@ schemaBuilderProto.loadableInterface = function loadableInterface<
   ref.implement(options);
 
   if (typeof nameOrRef !== 'string') {
-    this.configStore.associateRefWithName(nameOrRef, name);
+    this.configStore.associateParamWithRef(nameOrRef, ref);
   }
 
   return ref;
@@ -114,7 +114,7 @@ schemaBuilderProto.loadableUnion = function loadableUnion<
 
   const ref = new LoadableUnionRef<SchemaTypes, Shape, Shape, Key, CacheKey>(name, getDataloader);
 
-  this.unionType(name, {
+  const unionRef = this.unionType(name, {
     ...options,
     extensions: {
       getDataloader,
@@ -122,7 +122,7 @@ schemaBuilderProto.loadableUnion = function loadableUnion<
     },
   });
 
-  this.configStore.associateRefWithName(ref, name);
+  this.configStore.associateParamWithRef(ref, unionRef);
 
   return ref;
 };
@@ -205,7 +205,7 @@ schemaBuilderProto.loadableNode = function loadableNode<
   });
 
   if (typeof nameOrRef !== 'string') {
-    this.configStore.associateRefWithName(nameOrRef, name);
+    this.configStore.associateParamWithRef(nameOrRef, ref);
   }
 
   return ref;

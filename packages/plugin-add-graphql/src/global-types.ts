@@ -8,7 +8,7 @@ import {
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql';
-import { InputTypeRef, SchemaTypes } from '@pothos/core';
+import { SchemaTypes } from '@pothos/core';
 import {
   AddGraphQLEnumTypeOptions,
   AddGraphQLInputTypeOptions,

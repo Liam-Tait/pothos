@@ -1,20 +1,13 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLScalarType,
-  GraphQLString,
-} from 'graphql';
 import { PothosSchemaError } from './errors';
 import { BaseTypeRef } from './refs/base';
-import { BuiltinScalarRef } from './refs/builtin-scalar';
-import { InputTypeRef } from './refs/input';
+import { InputObjectRef } from './refs/input-object';
+import { InterfaceRef } from './refs/interface';
 import { MutationRef } from './refs/mutation';
 import { ObjectRef } from './refs/object';
 import { QueryRef } from './refs/query';
 import { SubscriptionRef } from './refs/subscription';
+import { UnionRef } from './refs/union';
 import type {
   ConfigurableRef,
   FieldMap,
@@ -23,6 +16,8 @@ import type {
   InputRef,
   OutputType,
   PothosFieldConfig,
+  PothosInputFieldConfig,
+  PothosOutputFieldConfig,
   PothosTypeConfig,
   SchemaTypes,
 } from './types';
@@ -37,6 +32,8 @@ export class ConfigStore<Types extends SchemaTypes> {
   >();
 
   private fields = new Map<string, Map<string, PothosFieldConfig<Types>>>();
+
+  private refs = new Set<BaseTypeRef<Types>>();
 
   private pendingActions: (() => void)[] = [];
 
@@ -53,27 +50,13 @@ export class ConfigStore<Types extends SchemaTypes> {
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
     this.builder = builder;
-
-    const scalars: GraphQLScalarType[] = [
-      GraphQLID,
-      GraphQLInt,
-      GraphQLFloat,
-      GraphQLString,
-      GraphQLBoolean,
-    ];
-
-    scalars.forEach((scalar) => {
-      this.associateParamWithRef(
-        scalar.name as ConfigurableRef<Types>,
-        new BuiltinScalarRef<Types, unknown, unknown>(scalar),
-      );
-    });
   }
 
   addFields(param: ConfigurableRef<Types>, fields: () => FieldMap) {
-    this.onConfig(param, (config, ref) => {
+    this.onTypeConfig(param, (config, ref) => {
       if (
         !(
+          ref instanceof InterfaceRef ||
           ref instanceof ObjectRef ||
           ref instanceof QueryRef ||
           ref instanceof MutationRef ||
@@ -88,40 +71,41 @@ export class ConfigStore<Types extends SchemaTypes> {
   }
 
   addInputFields(param: ConfigurableRef<Types>, fields: () => InputFieldMap) {
-    this.onConfig(param, (config, ref) => {
-      if (!(ref instanceof InputTypeRef)) {
-        throw new PothosSchemaError(`Can not add fields to ${ref} because it is not an object`);
+    this.onTypeConfig(param, (config, ref) => {
+      if (!(ref instanceof InputObjectRef)) {
+        throw new PothosSchemaError(
+          `Can not add fields to ${ref} because it is not an input object`,
+        );
       }
 
       ref.addFields(fields);
     });
   }
 
-  associateParamWithRef<T>(param: ConfigurableRef<Types> | string, ref: BaseTypeRef<Types, T>) {
+  associateParamWithRef<T>(param: ConfigurableRef<Types>, ref: BaseTypeRef<Types, T>) {
+    this.refs.add(ref as BaseTypeRef<Types>);
     const resolved = this.resolveParamAssociations(ref);
     this.paramAssociations.set(param, resolved);
 
     const pendingResolutions = this.pendingTypeConfigResolutions.get(param) ?? [];
 
-    if (pendingResolutions.length === 0) {
-      return;
-    }
-
-    if (typeof resolved === 'string' && this.typeConfigs.has(resolved)) {
-      pendingResolutions.forEach((cb) => {
-        const { config, ref: resolvedRef } = this.typeConfigs.get(resolved)!;
-        cb(config, resolvedRef);
-      });
-    } else {
-      pendingResolutions.forEach((cb) => {
-        this.onConfig(resolved as ConfigurableRef<Types>, cb);
-      });
+    if (pendingResolutions.length > 0) {
+      if (typeof resolved === 'string' && this.typeConfigs.has(resolved)) {
+        pendingResolutions.forEach((cb) => {
+          const { config, ref: resolvedRef } = this.typeConfigs.get(resolved)!;
+          cb(config, resolvedRef);
+        });
+      } else {
+        pendingResolutions.forEach((cb) => {
+          this.onTypeConfig(resolved as ConfigurableRef<Types>, cb);
+        });
+      }
     }
 
     this.pendingTypeConfigResolutions.delete(param);
   }
 
-  onConfig(
+  onTypeConfig(
     param: ConfigurableRef<Types>,
     onConfig: (config: PothosTypeConfig, ref: BaseTypeRef<Types>) => void,
   ) {
@@ -130,19 +114,19 @@ export class ConfigStore<Types extends SchemaTypes> {
     if (typeof resolved === 'string' && this.typeConfigs.has(resolved)) {
       onConfig(this.typeConfigs.get(resolved)!.config, this.typeConfigs.get(resolved)!.ref);
     } else {
-      if (!this.pendingTypeConfigResolutions.has(param)) {
-        this.pendingTypeConfigResolutions.set(param, []);
+      if (!this.pendingTypeConfigResolutions.has(resolved)) {
+        this.pendingTypeConfigResolutions.set(resolved, []);
       }
-      this.pendingTypeConfigResolutions.get(param)!.push(onConfig);
+      this.pendingTypeConfigResolutions.get(resolved)!.push(onConfig);
     }
   }
 
-  onConfigOfKind<Kind extends PothosTypeConfig['kind']>(
+  onTypeConfigOfKind<Kind extends PothosTypeConfig['kind']>(
     param: ConfigurableRef<Types>,
     kind: Kind,
     onConfig: (config: PothosTypeConfig & { kind: Kind }) => void,
   ) {
-    this.onConfig(param, (config) => {
+    this.onTypeConfig(param, (config) => {
       if (config.kind !== kind) {
         throw new PothosSchemaError(
           `Expected ${this.describeRef(param)} to be of kind ${kind} but it is of kind ${
@@ -156,6 +140,7 @@ export class ConfigStore<Types extends SchemaTypes> {
   }
 
   addImplementedTypeRef<T>(type: BaseTypeRef<Types, T>) {
+    this.refs.add(type as BaseTypeRef<Types>);
     const config = type.toConfig(this.builder) as PothosTypeConfig;
 
     if (this.typeConfigs.has(config.name)) {
@@ -164,6 +149,7 @@ export class ConfigStore<Types extends SchemaTypes> {
       );
     }
 
+    this.paramAssociations.set(type, config.name);
     this.typeConfigs.set(config.name, { config, ref: type as BaseTypeRef<Types> });
 
     if (this.pendingTypeConfigResolutions.has(config.name)) {
@@ -177,6 +163,16 @@ export class ConfigStore<Types extends SchemaTypes> {
 
   hasImplementation(typeName: string) {
     return this.typeConfigs.has(typeName);
+  }
+
+  hasConfig(ref: ConfigurableRef<Types> | string) {
+    const resolved = this.resolveParamAssociations(ref);
+
+    if (typeof resolved !== 'string' || !this.typeConfigs.has(resolved)) {
+      return false;
+    }
+
+    return true;
   }
 
   getTypeConfig<T extends PothosTypeConfig['kind']>(
@@ -263,6 +259,27 @@ export class ConfigStore<Types extends SchemaTypes> {
   prepareForBuild() {
     this.pending = false;
 
+    this.refs.forEach((ref) => {
+      this.buildFields(ref);
+
+      if (ref instanceof ObjectRef) {
+        this.updateTypeConfig(ref, 'Object', (config) => ({
+          ...config,
+          interfaces: [...(config.interfaces ?? []), ...ref.getInterfaces()],
+        }));
+      } else if (ref instanceof InterfaceRef) {
+        this.updateTypeConfig(ref, 'Interface', (config) => ({
+          ...config,
+          interfaces: [...(config.interfaces ?? []), ...ref.getInterfaces()],
+        }));
+      } else if (ref instanceof UnionRef) {
+        this.updateTypeConfig(ref, 'Union', (config) => ({
+          ...config,
+          types: [...config.types, ...ref.getTypes()],
+        }));
+      }
+    });
+
     const { pendingActions } = this;
 
     this.pendingActions = [];
@@ -286,6 +303,68 @@ export class ConfigStore<Types extends SchemaTypes> {
     } else {
       cb();
     }
+  }
+
+  buildFields(ref: BaseTypeRef<Types>) {
+    if (ref instanceof InputObjectRef) {
+      const config = this.getTypeConfig(ref.name, 'InputObject');
+
+      this.fields.set(
+        config.name,
+        ref.getFields(
+          this.builder,
+          config,
+          this.fields.get(config.name) as Map<string, PothosInputFieldConfig<Types>>,
+        ),
+      );
+    } else if (ref instanceof ObjectRef) {
+      const config = this.getTypeConfig(ref.name, 'Object');
+      this.fields.set(
+        config.name,
+        (ref as ObjectRef<Types, unknown>).getFields(
+          this.builder,
+          config,
+          this.fields.get(ref.name) as Map<string, PothosOutputFieldConfig<Types>>,
+        ),
+      );
+    } else if (ref instanceof InterfaceRef) {
+      const config = this.getTypeConfig(ref.name, 'Interface');
+      this.fields.set(
+        config.name,
+        (ref as InterfaceRef<Types, unknown>).getFields(
+          this.builder,
+          config,
+          this.fields.get(ref.name) as Map<string, PothosOutputFieldConfig<Types>>,
+        ),
+      );
+    }
+  }
+
+  private updateTypeConfig<T extends PothosTypeConfig['kind']>(
+    ref: ConfigurableRef<Types> | string,
+    kind: T,
+    config: (
+      config: Extract<PothosTypeConfig, { kind: T }>,
+    ) => Extract<PothosTypeConfig, { kind: T }>,
+  ) {
+    const resolved = this.resolveParamAssociations(ref);
+
+    if (typeof resolved !== 'string' || !this.typeConfigs.has(resolved)) {
+      throw new PothosSchemaError(`${this.describeRef(ref)} has not been implemented`);
+    }
+
+    const matched = this.typeConfigs.get(resolved)!;
+
+    if (matched.config.graphqlKind !== kind) {
+      throw new PothosSchemaError(
+        `Expected ref to resolve to a ${kind} type, but got ${matched.config.kind}`,
+      );
+    }
+
+    matched.config = {
+      ...matched.config,
+      ...config(matched.config as Extract<PothosTypeConfig, { kind: T }>),
+    };
   }
 
   private resolveParamAssociations(param: unknown) {

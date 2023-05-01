@@ -441,11 +441,11 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
       return cache.get(name)! as T;
     }
 
-    const ref = new InputObjectRef(this.builder, name);
+    const ref = new InputObjectRef(name);
 
     cache.set(name, ref);
 
-    this.builder.configStore.associateRefWithName(ref, create().name);
+    this.builder.configStore.associateParamWithRef(ref, create());
 
     return ref as T;
   }

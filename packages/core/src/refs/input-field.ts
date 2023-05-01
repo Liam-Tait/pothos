@@ -1,7 +1,6 @@
 import { PothosSchemaError } from '../errors';
 import {
   inputFieldShapeKey,
-  PothosFieldConfig,
   PothosInputFieldConfig,
   PothosTypeConfig,
   SchemaTypes,
@@ -52,7 +51,7 @@ export class InputFieldRef<Types extends SchemaTypes, T = unknown> {
     builder: PothosSchemaTypes.SchemaBuilder<Types>,
     name: string,
     typeConfig: PothosTypeConfig,
-  ): PothosFieldConfig<Types> {
+  ): PothosInputFieldConfig<Types> {
     if (!this.initConfig) {
       throw new PothosSchemaError(`Field ${typeConfig.name}.${name} has not been implemented`);
     }

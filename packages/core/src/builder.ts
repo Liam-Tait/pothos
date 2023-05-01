@@ -35,6 +35,7 @@ import type {
   AbstractReturnShape,
   AddVersionedDefaultsToBuilderOptions,
   BaseEnum,
+  ConfigurableRef,
   EnumParam,
   EnumTypeOptions,
   EnumValues,
@@ -178,7 +179,7 @@ export class SchemaBuilder<Types extends SchemaTypes> {
       ref.addInterfaces(options.interfaces);
     }
 
-    if (ref !== param && typeof ref !== 'string') {
+    if (ref !== param && typeof param !== 'string') {
       this.configStore.associateParamWithRef(param, ref);
     }
 
@@ -478,7 +479,6 @@ export class SchemaBuilder<Types extends SchemaTypes> {
     });
 
     this.configStore.addImplementedTypeRef(ref);
-
     ref.addTypes(options.types);
 
     return ref;
@@ -516,7 +516,7 @@ export class SchemaBuilder<Types extends SchemaTypes> {
 
     this.configStore.addImplementedTypeRef(ref);
     if (typeof param !== 'string') {
-      this.configStore.associateParamWithRef(param, ref);
+      this.configStore.associateParamWithRef(param as ConfigurableRef<Types>, ref);
     }
 
     return ref;
@@ -601,7 +601,7 @@ export class SchemaBuilder<Types extends SchemaTypes> {
     this.configStore.addImplementedTypeRef(ref);
 
     if (param !== ref && typeof param !== 'string') {
-      this.configStore.associateParamWithRef(param, ref);
+      this.configStore.associateParamWithRef(param as ConfigurableRef<Types>, ref);
     }
 
     this.configStore.addInputFields(ref, () =>

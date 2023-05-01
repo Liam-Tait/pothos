@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 
+import { PothosSchemaError } from '../errors';
 import {
   FieldMap,
   InterfaceParam,
@@ -8,9 +9,11 @@ import {
   outputShapeKey,
   parentShapeKey,
   PothosInterfaceTypeConfig,
+  PothosOutputFieldConfig,
   SchemaTypes,
 } from '../types';
 import { BaseTypeRef } from './base';
+import { FieldRef } from './field';
 
 export class InterfaceRef<Types extends SchemaTypes, T, P = T>
   extends BaseTypeRef<Types, PothosInterfaceTypeConfig>
@@ -34,6 +37,42 @@ export class InterfaceRef<Types extends SchemaTypes, T, P = T>
 
   addInterfaces(interfaces: (() => InterfaceParam<Types>[]) | InterfaceParam<Types>[]) {
     this.interfaces.add(() => (Array.isArray(interfaces) ? interfaces : interfaces()));
+  }
+
+  getFields(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
+    config: PothosInterfaceTypeConfig,
+    fields = new Map<string, PothosOutputFieldConfig<Types>>(),
+  ) {
+    for (const fieldMap of this.fields) {
+      for (const [fieldName, field] of Object.entries(fieldMap())) {
+        if (field) {
+          if (fields.has(fieldName)) {
+            throw new PothosSchemaError(`Duplicate field ${fieldName} on ${config.name}`);
+          }
+
+          fields.set(fieldName, (field as FieldRef<Types>).getConfig(builder, fieldName, config));
+        }
+      }
+    }
+
+    return fields;
+  }
+
+  override toConfig(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
+    const config = super.toConfig(builder);
+
+    return {
+      ...config,
+      // interfaces: this.getInterfaces(config),
+    };
+  }
+
+  getInterfaces() {
+    return [...this.interfaces].reduce<InterfaceParam<SchemaTypes>[]>(
+      (all, interfaces) => [...all, ...(interfaces() as InterfaceParam<SchemaTypes>[])],
+      [],
+    );
   }
 }
 

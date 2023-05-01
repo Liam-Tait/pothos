@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { PothosSchemaError } from '../errors';
 import {
   FieldMap,
   InterfaceParam,
@@ -6,13 +7,23 @@ import {
   OutputRef,
   outputShapeKey,
   parentShapeKey,
+  PothosMutationTypeConfig,
   PothosObjectTypeConfig,
+  PothosOutputFieldConfig,
+  PothosQueryTypeConfig,
+  PothosSubscriptionTypeConfig,
   SchemaTypes,
 } from '../types';
 import { BaseTypeRef } from './base';
+import { FieldRef } from './field';
 
+export type ObjectLikeConfig =
+  | PothosObjectTypeConfig
+  | PothosQueryTypeConfig
+  | PothosMutationTypeConfig
+  | PothosSubscriptionTypeConfig;
 export class ObjectRef<Types extends SchemaTypes, T, P = T>
-  extends BaseTypeRef<Types, PothosObjectTypeConfig>
+  extends BaseTypeRef<Types, ObjectLikeConfig>
   implements OutputRef, PothosSchemaTypes.ObjectRef<Types, T, P>
 {
   override kind = 'Object' as const;
@@ -33,6 +44,42 @@ export class ObjectRef<Types extends SchemaTypes, T, P = T>
 
   addInterfaces(interfaces: (() => InterfaceParam<Types>[]) | InterfaceParam<Types>[]) {
     this.interfaces.add(() => (Array.isArray(interfaces) ? interfaces : interfaces()));
+  }
+
+  getFields(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
+    config: ObjectLikeConfig,
+    fields = new Map<string, PothosOutputFieldConfig<Types>>(),
+  ) {
+    for (const fieldMap of this.fields) {
+      for (const [fieldName, field] of Object.entries(fieldMap())) {
+        if (field) {
+          if (fields.has(fieldName)) {
+            throw new PothosSchemaError(`Duplicate field ${fieldName} on ${config.name}`);
+          }
+
+          fields.set(fieldName, (field as FieldRef<Types>).getConfig(builder, fieldName, config));
+        }
+      }
+    }
+
+    return fields;
+  }
+
+  override toConfig(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
+    const config = super.toConfig(builder) as PothosObjectTypeConfig;
+
+    return {
+      ...config,
+      // interfaces: this.getInterfaces(config),
+    };
+  }
+
+  getInterfaces() {
+    return [...this.interfaces].reduce<InterfaceParam<SchemaTypes>[]>(
+      (all, interfaces) => [...all, ...(interfaces() as InterfaceParam<SchemaTypes>[])],
+      [],
+    );
   }
 }
 

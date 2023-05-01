@@ -20,4 +20,20 @@ export class UnionRef<Types extends SchemaTypes, T, P = T>
   addTypes(types: (() => ObjectParam<Types>[]) | ObjectParam<Types>[]) {
     this.types.add(() => (Array.isArray(types) ? types : types()));
   }
+
+  override toConfig(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
+    const config = super.toConfig(builder);
+
+    return {
+      ...config,
+      // types: this.getTypes(config),
+    };
+  }
+
+  getTypes() {
+    return [...this.types].reduce<ObjectParam<SchemaTypes>[]>(
+      (all, types) => [...all, ...(types() as ObjectParam<SchemaTypes>[])],
+      [],
+    );
+  }
 }
